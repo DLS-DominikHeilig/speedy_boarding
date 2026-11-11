@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpeedyBoarding Setup</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1a1d23; --muted: #5f6672;
+    --border: #e2e5ea; --accent: #2f6fed; --accent-soft: #e8f0fe;
+    --done: #1f9d55; --done-soft: #e6f6ec; --code-bg: #f0f2f5; --warn-soft: #fff6e0; --warn: #8a5a00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121418; --card: #1b1e24; --text: #e8eaee; --muted: #9aa1ad;
+      --border: #2c3038; --accent: #6b9bff; --accent-soft: #1f2a40;
+      --done: #4cc98a; --done-soft: #17301f; --code-bg: #24282f; --warn-soft: #33290f; --warn: #f0c060;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121418; --card: #1b1e24; --text: #e8eaee; --muted: #9aa1ad;
+    --border: #2c3038; --accent: #6b9bff; --accent-soft: #1f2a40;
+    --done: #4cc98a; --done-soft: #17301f; --code-bg: #24282f; --warn-soft: #33290f; --warn: #f0c060;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header h1 { margin: 0 0 6px; font-size: 1.9rem; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin: 24px 0 8px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 180px; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--done); transition: width .25s; }
+  .count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
+  .os { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .os button { border: 0; background: var(--card); color: var(--text); padding: 6px 14px; font: inherit; font-size: .9rem; cursor: pointer; }
+  .os button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .hint { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: .92rem; margin: 16px 0 24px; }
+  section.step {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    margin: 12px 0; overflow: hidden;
+  }
+  section.step.done { border-color: var(--done); }
+  .step-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .step-head input { width: 22px; height: 22px; accent-color: var(--done); cursor: pointer; flex: none; }
+  .num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 600; font-size: .85rem; }
+  .done .num { background: var(--done-soft); color: var(--done); }
+  .step-head h2 { margin: 0; font-size: 1.05rem; flex: 1; }
+  .done .step-head h2 { color: var(--muted); text-decoration: line-through; }
+  .chev { color: var(--muted); transition: transform .2s; }
+  .open .chev { transform: rotate(90deg); }
+  .step-body { display: none; padding: 0 16px 16px 56px; }
+  .open .step-body { display: block; }
+  .why { color: var(--muted); margin: 0 0 12px; }
+  ol { margin: 0; padding-left: 20px; }
+  ol li { margin: 6px 0; }
+  .code { position: relative; background: var(--code-bg); border-radius: 8px; margin: 8px 0; padding: 10px 70px 10px 12px; font: 13.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all; }
+  .copy { position: absolute; top: 6px; right: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 6px; font-size: .78rem; padding: 3px 8px; cursor: pointer; }
+  .note { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; margin-top: 12px; font-size: .92rem; }
+  .finish { text-align: center; margin-top: 28px; color: var(--muted); }
+  .finish.all { color: var(--done); font-weight: 600; }
+  .reset { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
+  a { color: var(--accent); }
+  @media (max-width: 520px) { .step-body { padding-left: 16px; } header h1 { font-size: 1.5rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>SpeedyBoarding</h1>
+    <p>Dein Setup vor dem ersten Kurstermin. Hake jeden Schritt ab, dein Fortschritt wird in diesem Browser gespeichert.</p>
+  </header>
+
+  <div class="bar-row">
+    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+    <span class="count" id="count">0 / 0</span>
+    <div class="os" role="group" aria-label="Betriebssystem">
+      <button type="button" data-os="mac">macOS</button>
+      <button type="button" data-os="win">Windows</button>
+    </div>
+  </div>
+
+  <div class="hint">⏱ Bitte <strong>vor dem Kurs</strong> erledigen. Die Git-Installation auf dem Mac kann bis zu 45 Minuten dauern, und wenn alle gleichzeitig im Kurs-WLAN laden, wird es noch langsamer.</div>
+
+  <main id="steps"></main>
+
+  <p class="finish" id="finish"></p>
+  <p style="text-align:center"><button class="reset" id="reset" type="button">Checkliste zurücksetzen</button></p>
+</div>
+
+<script>
+// Inhalte: neue Schritte einfach hier ergänzen.
+// mac / win: OS-spezifische Inhalte; all: für beide.
+const STEPS = [
+  {
+    id: "git",
+    title: "Git installieren",
+    why: "Git bringt deinen Code zu GitHub. Das Terminal ist auf jedem Rechner da, Git aber nicht. Ohne Git kann Claude nicht committen oder pushen.",
+    mac: [
+      ["Terminal öffnen: ⌘ + Leertaste, „Terminal“ eingeben."],
+      ["Diesen Befehl eingeben und Enter drücken:", "xcode-select --install"],
+      ["Im Fenster auf <strong>„Installieren“</strong> klicken, <strong>nicht</strong> auf „Xcode laden“ (über 10 GB, brauchst du nicht)."],
+      ["Lizenz akzeptieren und warten, bis <strong>„Die Software wurde installiert“</strong> erscheint. Nicht auf „Stoppen“ klicken."],
+    ],
+    macNote: "Homebrew ist keine Abkürzung: Es installiert zuerst genau dieses Paket. Wer früher mit VS Code gearbeitet hat, hat Git oft schon. Dann zeigt der Prüf-Befehl unten sofort eine Version.",
+    win: [
+      ["<a href=\"https://git-scm.com/download/win\" target=\"_blank\" rel=\"noopener\">Git for Windows</a> herunterladen."],
+      ["Installer ausführen, Standardeinstellungen belassen. Bei „Adjusting your PATH environment“ die mittlere Option aktiv lassen."],
+      ["PowerShell schließen und neu öffnen."],
+    ],
+    all: [["Prüfen, ob es geklappt hat:", "git --version"]],
+    allNote: "Zeigt eine Versionsnummer (z. B. git version 2.x)? Dann abhaken.",
+  },
+  {
+    id: "git-config",
+    title: "Git deinen Namen geben",
+    why: "Einmalig nötig. Ohne Namen und E-Mail gibt es beim ersten Commit eine Fehlermeldung.",
+    all: [
+      ["Name und E-Mail setzen:", "git config --global user.name \"Dein Name\"\ngit config --global user.email \"deine@email.de\""],
+      ["Prüfen:", "git config --global --list"],
+    ],
+  },
+  {
+    id: "node",
+    title: "Node.js installieren",
+    why: "Ohne Node.js laufen keine modernen Web-Projekte: Pakete installieren, lokale Vorschau starten.",
+    mac: [["Auf <a href=\"https://nodejs.org/en/download\" target=\"_blank\" rel=\"noopener\">nodejs.org</a> die <strong>LTS-Version</strong> als macOS-Installer (.pkg) laden und installieren."]],
+    win: [["Auf <a href=\"https://nodejs.org/en/download\" target=\"_blank\" rel=\"noopener\">nodejs.org</a> die <strong>LTS-Version</strong> als Windows-Installer (.msi) laden, installieren, danach PowerShell neu öffnen."]],
+    all: [["Prüfen:", "node --version"]],
+  },
+  {
+    id: "github",
+    title: "GitHub-Account anlegen",
+    why: "Hier liegen deine Projekte online. Deinen Benutzernamen brauchst du bei jedem Projekt.",
+    all: [
+      ["Auf <a href=\"https://github.com/signup\" target=\"_blank\" rel=\"noopener\">github.com</a> registrieren und den kostenlosen Plan wählen."],
+      ["E-Mail bestätigen. Schon einen Account? Einfach abhaken."],
+    ],
+  },
+  {
+    id: "github-login",
+    title: "Bei GitHub anmelden (erster Push)",
+    why: "Beim ersten Push fragt Git, wer du bist. Danach merkt sich dein Rechner die Anmeldung.",
+    all: [
+      ["Wenn Git nach dem <strong>Username</strong> fragt: deinen GitHub-Benutzernamen eingeben."],
+      ["Beim <strong>Password</strong> nicht dein GitHub-Passwort eingeben, sondern einen <strong>Personal Access Token</strong>: github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → „Generate new token“, Haken bei <code>repo</code>."],
+    ],
+    allNote: "Beim Einfügen des Tokens erscheint nichts auf dem Bildschirm. Das ist normal.",
+  },
+  {
+    id: "claude",
+    title: "Claude-App installieren",
+    why: "Wir arbeiten direkt in der Claude-App im Code-Tab, nicht über VS Code. Claude legt Dateien an, committet und pusht für dich.",
+    all: [
+      ["Von <a href=\"https://claude.ai/download\" target=\"_blank\" rel=\"noopener\">claude.ai/download</a> laden, installieren und anmelden."],
+      ["Den <strong>Code</strong>-Tab öffnen und einen Projektordner wählen."],
+    ],
+  },
+];
+
+const KEY = "speedyboarding-v1";
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+
+const state = Object.assign({ done: {}, os: /Win/i.test(navigator.platform) ? "win" : "mac", open: STEPS[0].id }, load());
+
+function esc(s) { return s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+
+function items(list) {
+  return list.map(([text, code]) =>
+    `<li>${text}${code ? `<div class="code">${esc(code)}<button class="copy" type="button">Kopieren</button></div>` : ""}</li>`
+  ).join("");
+}
+
+function render() {
+  const os = state.os;
+  document.querySelectorAll(".os button").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
+  document.getElementById("steps").innerHTML = STEPS.map((s, i) => {
+    const list = [...(s[os] || []), ...(s.all || [])];
+    const note = [s[os + "Note"], s.allNote].filter(Boolean).map(n => `<div class="note">${n}</div>`).join("");
+    const done = !!state.done[s.id];
+    return `<section class="step${done ? " done" : ""}${state.open === s.id ? " open" : ""}" data-id="${s.id}">
+      <div class="step-head">
+        <input type="checkbox" ${done ? "checked" : ""} aria-label="${s.title} erledigt">
+        <span class="num">${i + 1}</span>
+        <h2>${s.title}</h2>
+        <span class="chev">›</span>
+      </div>
+      <div class="step-body"><p class="why">${s.why}</p><ol>${items(list)}</ol>${note}</div>
+    </section>`;
+  }).join("");
+  const n = STEPS.filter(s => state.done[s.id]).length;
+  document.getElementById("bar").style.width = (n / STEPS.length * 100) + "%";
+  document.getElementById("count").textContent = `${n} / ${STEPS.length}`;
+  const fin = document.getElementById("finish");
+  fin.className = "finish" + (n === STEPS.length ? " all" : "");
+  fin.textContent = n === STEPS.length ? "🎉 Alles erledigt, du bist startklar!" : `Noch ${STEPS.length - n} Schritt${STEPS.length - n === 1 ? "" : "e"}.`;
+}
+
+document.getElementById("steps").addEventListener("click", e => {
+  const sec = e.target.closest(".step"); if (!sec) return;
+  const id = sec.dataset.id;
+  if (e.target.matches(".copy")) {
+    const text = e.target.parentElement.firstChild.textContent;
+    navigator.clipboard?.writeText(text).then(() => { e.target.textContent = "Kopiert ✓"; setTimeout(() => e.target.textContent = "Kopieren", 1500); }).catch(() => {});
+    return;
+  }
+  if (e.target.matches("input[type=checkbox]")) {
+    state.done[id] = e.target.checked;
+    if (e.target.checked) { const next = STEPS.find(s => !state.done[s.id]); state.open = next ? next.id : null; }
+    save(); render(); return;
+  }
+  if (e.target.closest(".step-head")) { state.open = state.open === id ? null : id; save(); render(); }
+});
+document.querySelectorAll(".os button").forEach(b => b.addEventListener("click", () => { state.os = b.dataset.os; save(); render(); }));
+document.getElementById("reset").addEventListener("click", () => { state.done = {}; state.open = STEPS[0].id; save(); render(); });
+
+render();
+</script>
+</body>
+</html>
