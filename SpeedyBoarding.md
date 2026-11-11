@@ -36,11 +36,37 @@ git --version
 ```
 Erscheint eine Versionsnummer (z. B. `git version 2.x`), ist alles bereit. Erscheint stattdessen ein Hinweis auf fehlende Developer Tools, ist die Installation noch nicht fertig.
 
-## 2. GitHub-Account
+## 2. Git deinen Namen geben
+
+Einmalig nach der Installation. Ohne Namen und E-Mail gibt es beim ersten Commit eine Fehlermeldung. Beides muss nicht mit GitHub übereinstimmen.
+
+```bash
+git config --global user.name "Dein Name"
+git config --global user.email "deine@email.de"
+```
+
+Prüfen:
+```bash
+git config --global --list
+```
+
+## 3. Node.js installieren
+
+**Warum?** Ohne Node.js laufen keine modernen Web-Projekte: Pakete installieren (`npm`), lokale Vorschau starten.
+
+- **Mac:** Auf [nodejs.org](https://nodejs.org/en/download) die **LTS-Version** als macOS-Installer (.pkg) laden und installieren.
+- **Windows:** Auf [nodejs.org](https://nodejs.org/en/download) die **LTS-Version** als Windows-Installer (.msi) laden, installieren und danach die PowerShell neu öffnen.
+
+Prüfen:
+```bash
+node --version
+```
+
+## 4. GitHub-Account
 
 1. Account auf [github.com](https://github.com) anlegen, falls noch nicht vorhanden.
 2. Beim ersten Push fragt Git nach einer Anmeldung. Dann die **Anmeldung im Browser** wählen oder einen *Personal Access Token* verwenden, **nicht** das normale GitHub-Passwort.
 
-## 3. In der Claude-App arbeiten
+## 5. In der Claude-App arbeiten
 
 Wir arbeiten direkt in der Claude-App (Code-Tab), nicht über VS Code. Das ist komfortabler: Claude legt Dateien an, committet und pusht für dich, sobald Git installiert ist.
