@@ -64,9 +64,73 @@ node --version
 
 ## 4. GitHub-Account
 
-1. Account auf [github.com](https://github.com) anlegen, falls noch nicht vorhanden.
-2. Beim ersten Push fragt Git nach einer Anmeldung. Dann die **Anmeldung im Browser** wählen oder einen *Personal Access Token* verwenden, **nicht** das normale GitHub-Passwort.
+1. Auf [github.com/signup](https://github.com/signup) registrieren und den kostenlosen Plan (**Free**) wählen.
+2. E-Mail bestätigen.
+3. **Benutzernamen merken.** Du brauchst ihn gleich und bei jedem Projekt.
 
-## 5. In der Claude-App arbeiten
+Schon einen Account? Weiter zu Schritt 5.
+
+## 5. GitHub mit deinem Rechner verbinden (Schritt für Schritt)
+
+**Worum geht es?** Wenn du (oder Claude) zum ersten Mal Code zu GitHub hochlädst („pushen“), fragt Git im Terminal: *Wer bist du?* Dein normales GitHub-Passwort funktioniert dort **nicht**. Stattdessen brauchst du einen **Token**, eine Art Passwort nur für Git. Das machst du **einmal**, danach merkt sich dein Rechner die Anmeldung.
+
+### Teil A: Token auf GitHub erstellen (ca. 2 Minuten)
+
+1. Auf [github.com](https://github.com) einloggen.
+2. Oben rechts auf dein **Profilbild** klicken, dann **Settings**.
+3. In der linken Spalte ganz nach unten scrollen, dann **Developer settings**.
+4. **Personal access tokens**, dann **Tokens (classic)**.
+5. Oben rechts auf **Generate new token**, dann **Generate new token (classic)**.
+6. Ausfüllen:
+   - **Note:** ein Name, z. B. `Mein Laptop`
+   - **Expiration:** wie lange der Token gilt, z. B. `90 days` (mindestens bis Kursende)
+   - **Select scopes:** Haken bei **`repo`** setzen (die anderen nicht nötig)
+7. Ganz unten auf **Generate token** klicken.
+8. Den grünen Code, der mit `ghp_` beginnt, **sofort kopieren**.
+
+> ⚠️ Der Token wird **nur einmal** angezeigt. Wenn du die Seite verlässt, ohne ihn kopiert zu haben, einfach einen neuen erstellen.
+>
+> 🔒 Den Token wie ein Passwort behandeln: nicht in Slack, E-Mails oder Dateien teilen.
+
+### Teil B: Im Terminal anmelden
+
+Beim ersten Push erscheint im Terminal:
+
+```
+Username for 'https://github.com':
+```
+
+1. Ins Terminal klicken.
+2. Deinen **GitHub-Benutzernamen** eintippen (nicht die E-Mail) und **Enter** drücken.
+3. Jetzt erscheint:
+   ```
+   Password for 'https://deinname@github.com':
+   ```
+4. Den **Token** einfügen (Mac: Cmd + V, Windows: Rechtsklick) und **Enter** drücken.
+
+> 👀 **Beim Einfügen erscheint nichts**, keine Punkte, keine Sternchen. Das ist normal. Einfach einmal einfügen und Enter drücken.
+
+### Hat es geklappt?
+
+Am Ende steht so etwas wie:
+
+```
+To https://github.com/deinname/dein-projekt.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+```
+
+Fertig. Dein Code ist auf GitHub, und ab jetzt kann Claude ohne erneute Anmeldung pushen.
+
+### Wenn es nicht klappt
+
+| Meldung | Bedeutung | Lösung |
+|---|---|---|
+| `Authentication failed` / `Invalid username or token` | Token falsch, abgelaufen oder ohne Haken bei `repo` | Neuen Token erstellen (Teil A) und den Push erneut starten |
+| `Repository not found` | Das Repo gibt es auf GitHub noch nicht oder der Name ist falsch geschrieben | Auf github.com prüfen, ob das Repo existiert und genauso heißt |
+| Terminal fragt gar nicht, sondern bricht ab | Ein alter, falscher Login ist gespeichert | Mac: Schlüsselbundverwaltung öffnen, nach `github.com` suchen, Eintrag löschen, Push erneut starten |
+| Es passiert nichts nach dem Einfügen | Enter vergessen | Einmal Enter drücken |
+
+## 6. In der Claude-App arbeiten
 
 Wir arbeiten direkt in der Claude-App (Code-Tab), nicht über VS Code. Das ist komfortabler: Claude legt Dateien an, committet und pusht für dich, sobald Git installiert ist.

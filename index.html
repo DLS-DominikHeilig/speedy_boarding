@@ -68,6 +68,11 @@
   .code { position: relative; background: var(--black); color: #E8E8E8; border-radius: var(--radius-sm); margin: 8px 0; padding: 12px 84px 12px 14px; font: 13px/1.55 "JetBrains Mono", monospace; white-space: pre-wrap; word-break: break-all; }
   .copy { position: absolute; top: 8px; right: 8px; border: 0; background: var(--primary); color: #fff; border-radius: var(--radius-pill); font: 700 11px Inter, sans-serif; padding: 4px 10px; cursor: pointer; }
   .note { background: var(--primary-soft); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 12px; font-size: .92rem; }
+  .trouble { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; }
+  .trouble summary { cursor: pointer; font-weight: 700; }
+  .trouble dl { margin: 10px 0 0; }
+  .trouble dt { font-weight: 600; margin-top: 10px; }
+  .trouble dd { margin: 2px 0 0; color: var(--muted); }
   .finish { text-align: center; margin-top: 32px; color: var(--muted); font-weight: 600; }
   .finish.all { color: var(--primary-text); font-size: 1.1rem; }
   .reset { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
@@ -152,14 +157,50 @@ const STEPS = [
     ],
   },
   {
-    id: "github-login",
-    title: "Bei GitHub anmelden (erster Push)",
-    why: "Beim ersten Push fragt Git, wer du bist. Danach merkt sich dein Rechner die Anmeldung.",
+    id: "github-token",
+    title: "GitHub-Token erstellen",
+    why: "Beim ersten Push fragt Git im Terminal, wer du bist. Dein normales GitHub-Passwort funktioniert dort <strong>nicht</strong>. Du brauchst einen <strong>Token</strong>, eine Art Passwort nur für Git. Das machst du einmal.",
     all: [
-      ["Wenn Git nach dem <strong>Username</strong> fragt: deinen GitHub-Benutzernamen eingeben."],
-      ["Beim <strong>Password</strong> nicht dein GitHub-Passwort eingeben, sondern einen <strong>Personal Access Token</strong>: github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → „Generate new token“, Haken bei <code>repo</code>."],
+      ["Auf <a href=\"https://github.com\" target=\"_blank\" rel=\"noopener\">github.com</a> einloggen."],
+      ["Oben rechts auf dein <strong>Profilbild</strong> klicken, dann <strong>Settings</strong>."],
+      ["Links ganz nach unten scrollen, dann <strong>Developer settings</strong>."],
+      ["<strong>Personal access tokens</strong>, dann <strong>Tokens (classic)</strong>."],
+      ["<strong>Generate new token</strong>, dann <strong>Generate new token (classic)</strong>."],
+      ["Ausfüllen: <strong>Note</strong> z. B. <code>Mein Laptop</code>, <strong>Expiration</strong> mindestens bis Kursende (z. B. 90 days), bei <strong>Select scopes</strong> den Haken bei <code>repo</code> setzen."],
+      ["Unten auf <strong>Generate token</strong> klicken und den Code, der mit <code>ghp_</code> beginnt, <strong>sofort kopieren</strong>."],
     ],
-    allNote: "Beim Einfügen des Tokens erscheint nichts auf dem Bildschirm. Das ist normal.",
+    allNote: [
+      "⚠️ Der Token wird <strong>nur einmal</strong> angezeigt. Verpasst? Einfach einen neuen erstellen.",
+      "🔒 Wie ein Passwort behandeln: nicht in Slack, E-Mails oder Dateien teilen.",
+    ],
+  },
+  {
+    id: "github-login",
+    title: "Im Terminal bei GitHub anmelden",
+    why: "Das passiert beim ersten Push, egal ob du ihn selbst startest oder Claude. Danach merkt sich dein Rechner die Anmeldung.",
+    all: [
+      ["Im Terminal erscheint:", "Username for 'https://github.com':"],
+      ["Ins Terminal klicken, deinen <strong>GitHub-Benutzernamen</strong> eintippen (nicht die E-Mail) und <strong>Enter</strong> drücken."],
+    ],
+    mac: [],
+    win: [],
+    after: {
+      mac: [["Bei <code>Password for …</code> den <strong>Token</strong> einfügen (<strong>Cmd + V</strong>) und <strong>Enter</strong> drücken."]],
+      win: [["Bei <code>Password for …</code> den <strong>Token</strong> einfügen (<strong>Rechtsklick</strong>) und <strong>Enter</strong> drücken."]],
+      all: [["Geklappt, wenn am Ende so etwas steht:", "* [new branch]      main -> main\nbranch 'main' set up to track 'origin/main'."]],
+    },
+    allNote: ["👀 <strong>Beim Einfügen erscheint nichts</strong>, keine Punkte, keine Sternchen. Das ist normal: einmal einfügen, Enter."],
+    extra: `<details class="trouble"><summary>Es klappt nicht?</summary>
+      <dl>
+        <dt><code>Authentication failed</code> / <code>Invalid username or token</code></dt>
+        <dd>Token falsch, abgelaufen oder ohne Haken bei <code>repo</code>. Neuen Token erstellen und Push erneut starten.</dd>
+        <dt><code>Repository not found</code></dt>
+        <dd>Das Repo gibt es auf GitHub noch nicht oder der Name ist falsch geschrieben. Auf github.com prüfen.</dd>
+        <dt>Terminal fragt gar nicht, sondern bricht ab</dt>
+        <dd>Ein alter, falscher Login ist gespeichert. Mac: Schlüsselbundverwaltung öffnen, nach <code>github.com</code> suchen, Eintrag löschen, Push erneut starten.</dd>
+        <dt>Nach dem Einfügen passiert nichts</dt>
+        <dd>Enter vergessen. Einmal Enter drücken.</dd>
+      </dl></details>`,
   },
   {
     id: "claude",
@@ -190,8 +231,9 @@ function render() {
   const os = state.os;
   document.querySelectorAll(".os button").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
   document.getElementById("steps").innerHTML = STEPS.map((s, i) => {
-    const list = [...(s[os] || []), ...(s.all || [])];
-    const note = [s[os + "Note"], s.allNote].filter(Boolean).map(n => `<div class="note">${n}</div>`).join("");
+    const a = s.after || {};
+    const list = [...(s[os] || []), ...(s.all || []), ...(a[os] || []), ...(a.all || [])];
+    const note = [s[os + "Note"], s.allNote].flat().filter(Boolean).map(n => `<div class="note">${n}</div>`).join("") + (s.extra || "");
     const done = !!state.done[s.id];
     return `<section class="step${done ? " done" : ""}${state.open === s.id ? " open" : ""}" data-id="${s.id}">
       <div class="step-head">
