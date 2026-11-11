@@ -4,76 +4,88 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SpeedyBoarding Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  /* Design-Tokens übernommen vom DL-School-Tech-Onboarding */
   :root {
-    --bg: #f6f7f9; --card: #ffffff; --text: #1a1d23; --muted: #5f6672;
-    --border: #e2e5ea; --accent: #2f6fed; --accent-soft: #e8f0fe;
-    --done: #1f9d55; --done-soft: #e6f6ec; --code-bg: #f0f2f5; --warn-soft: #fff6e0; --warn: #8a5a00;
+    --primary: #00D4B4; --primary-dark: #00B89C; --primary-text: #00806E; --primary-soft: #E6FBF7;
+    --black: #0A0A0A; --text: #0A0A0A; --muted: #555555; --bg: #FFFFFF; --card: #FFFFFF;
+    --gray-light: #F5F5F5; --border: #E0E0E0; --red: #F52849; --yellow: #F5C842; --yellow-soft: #FEF7DE;
+    --radius-sm: 6px; --radius-md: 12px; --radius-lg: 24px; --radius-pill: 999px;
+    --shadow-card: 0 2px 16px rgba(0,0,0,0.08); --shadow-strong: 0 8px 32px rgba(0,0,0,0.14);
+    --code-text: #CC1F42;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #121418; --card: #1b1e24; --text: #e8eaee; --muted: #9aa1ad;
-      --border: #2c3038; --accent: #6b9bff; --accent-soft: #1f2a40;
-      --done: #4cc98a; --done-soft: #17301f; --code-bg: #24282f; --warn-soft: #33290f; --warn: #f0c060;
+      --primary-text: #3DE3C8; --primary-soft: #0F2E29; --text: #F2F2F2; --muted: #A5A5A5;
+      --bg: #0A0A0A; --card: #161616; --gray-light: #1F1F1F; --border: #2C2C2C;
+      --yellow-soft: #2E2710; --code-text: #FF6B85;
+      --shadow-card: 0 2px 16px rgba(0,0,0,0.5);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #121418; --card: #1b1e24; --text: #e8eaee; --muted: #9aa1ad;
-    --border: #2c3038; --accent: #6b9bff; --accent-soft: #1f2a40;
-    --done: #4cc98a; --done-soft: #17301f; --code-bg: #24282f; --warn-soft: #33290f; --warn: #f0c060;
+    --primary-text: #3DE3C8; --primary-soft: #0F2E29; --text: #F2F2F2; --muted: #A5A5A5;
+    --bg: #0A0A0A; --card: #161616; --gray-light: #1F1F1F; --border: #2C2C2C;
+    --yellow-soft: #2E2710; --code-text: #FF6B85;
+    --shadow-card: 0 2px 16px rgba(0,0,0,0.5);
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
-  header h1 { margin: 0 0 6px; font-size: 1.9rem; letter-spacing: -0.01em; }
-  header p { margin: 0; color: var(--muted); }
-  .bar-row { display: flex; align-items: center; gap: 12px; margin: 24px 0 8px; flex-wrap: wrap; }
-  .progress { flex: 1; min-width: 180px; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .progress > div { height: 100%; width: 0; background: var(--done); transition: width .25s; }
-  .count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
-  .os { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .os button { border: 0; background: var(--card); color: var(--text); padding: 6px 14px; font: inherit; font-size: .9rem; cursor: pointer; }
-  .os button[aria-pressed="true"] { background: var(--accent); color: #fff; }
-  .hint { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: .92rem; margin: 16px 0 24px; }
-  section.step {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    margin: 12px 0; overflow: hidden;
-  }
-  section.step.done { border-color: var(--done); }
-  .step-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
-  .step-head input { width: 22px; height: 22px; accent-color: var(--done); cursor: pointer; flex: none; }
-  .num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 600; font-size: .85rem; }
-  .done .num { background: var(--done-soft); color: var(--done); }
-  .step-head h2 { margin: 0; font-size: 1.05rem; flex: 1; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 Inter, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 48px 16px 72px; }
+  .eyebrow { font: 600 11px/1.4 "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--primary-text); margin: 0 0 10px; }
+  header h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 3.25rem); font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; }
+  header p { margin: 0; color: var(--muted); max-width: 560px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { background: var(--gray-light); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 12px; font-size: 12px; font-weight: 600; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin: 36px 0 8px; flex-wrap: wrap; }
+  .bar-label { font: 600 11px "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .progress { flex: 1; min-width: 160px; height: 6px; background: var(--border); border-radius: var(--radius-pill); overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--primary); transition: width .25s; }
+  .count { font: 600 13px "JetBrains Mono", monospace; color: var(--primary-text); font-variant-numeric: tabular-nums; }
+  .os { display: inline-flex; background: var(--gray-light); border-radius: var(--radius-pill); padding: 3px; }
+  .os button { border: 0; background: transparent; color: var(--text); padding: 6px 16px; font: 700 12px Inter, sans-serif; border-radius: var(--radius-pill); cursor: pointer; }
+  .os button[aria-pressed="true"] { background: var(--primary); color: #fff; }
+  .hint { background: var(--yellow-soft); border-left: 4px solid var(--yellow); border-radius: var(--radius-md); padding: 12px 16px; font-size: .92rem; margin: 18px 0 28px; }
+  section.step { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); margin: 14px 0; overflow: hidden; box-shadow: var(--shadow-card); transition: box-shadow .2s; }
+  section.step.open { box-shadow: var(--shadow-strong); }
+  section.step.done { border-color: var(--primary); }
+  .step-head { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; }
+  .step-head input { width: 22px; height: 22px; accent-color: var(--primary-dark); cursor: pointer; flex: none; }
+  .num { flex: none; font: 600 12px "JetBrains Mono", monospace; color: var(--primary-text); }
+  .step-head h2 { margin: 0; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; flex: 1; }
   .done .step-head h2 { color: var(--muted); text-decoration: line-through; }
-  .chev { color: var(--muted); transition: transform .2s; }
+  .chev { color: var(--muted); transition: transform .2s; font-size: 1.2rem; }
   .open .chev { transform: rotate(90deg); }
-  .step-body { display: none; padding: 0 16px 16px 56px; }
+  .step-body { display: none; padding: 0 18px 18px 72px; }
   .open .step-body { display: block; }
   .why { color: var(--muted); margin: 0 0 12px; }
   ol { margin: 0; padding-left: 20px; }
-  ol li { margin: 6px 0; }
-  .code { position: relative; background: var(--code-bg); border-radius: 8px; margin: 8px 0; padding: 10px 70px 10px 12px; font: 13.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all; }
-  .copy { position: absolute; top: 6px; right: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 6px; font-size: .78rem; padding: 3px 8px; cursor: pointer; }
-  .note { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; margin-top: 12px; font-size: .92rem; }
-  .finish { text-align: center; margin-top: 28px; color: var(--muted); }
-  .finish.all { color: var(--done); font-weight: 600; }
+  ol li { margin: 8px 0; }
+  ol li::marker { color: var(--primary-text); font-weight: 700; }
+  code { font-family: "JetBrains Mono", monospace; font-size: .88em; color: var(--code-text); }
+  .code { position: relative; background: var(--black); color: #E8E8E8; border-radius: var(--radius-sm); margin: 8px 0; padding: 12px 84px 12px 14px; font: 13px/1.55 "JetBrains Mono", monospace; white-space: pre-wrap; word-break: break-all; }
+  .copy { position: absolute; top: 8px; right: 8px; border: 0; background: var(--primary); color: #fff; border-radius: var(--radius-pill); font: 700 11px Inter, sans-serif; padding: 4px 10px; cursor: pointer; }
+  .note { background: var(--primary-soft); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 12px; font-size: .92rem; }
+  .finish { text-align: center; margin-top: 32px; color: var(--muted); font-weight: 600; }
+  .finish.all { color: var(--primary-text); font-size: 1.1rem; }
   .reset { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
-  a { color: var(--accent); }
-  @media (max-width: 520px) { .step-body { padding-left: 16px; } header h1 { font-size: 1.5rem; } }
+  a { color: var(--primary-text); font-weight: 600; }
+  @media (max-width: 520px) { .step-body { padding-left: 18px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <p class="eyebrow">DL School · Vor dem Start</p>
     <h1>SpeedyBoarding</h1>
     <p>Dein Setup vor dem ersten Kurstermin. Hake jeden Schritt ab, dein Fortschritt wird in diesem Browser gespeichert.</p>
+    <div class="chips"><span class="chip" id="chip-steps"></span><span class="chip">macOS &amp; Windows</span></div>
   </header>
 
   <div class="bar-row">
+    <span class="bar-label">Fortschritt</span>
     <div class="progress" aria-hidden="true"><div id="bar"></div></div>
     <span class="count" id="count">0 / 0</span>
     <div class="os" role="group" aria-label="Betriebssystem">
@@ -184,7 +196,7 @@ function render() {
     return `<section class="step${done ? " done" : ""}${state.open === s.id ? " open" : ""}" data-id="${s.id}">
       <div class="step-head">
         <input type="checkbox" ${done ? "checked" : ""} aria-label="${s.title} erledigt">
-        <span class="num">${i + 1}</span>
+        <span class="num">${String(i + 1).padStart(2, "0")}</span>
         <h2>${s.title}</h2>
         <span class="chev">›</span>
       </div>
@@ -217,6 +229,7 @@ document.getElementById("steps").addEventListener("click", e => {
 document.querySelectorAll(".os button").forEach(b => b.addEventListener("click", () => { state.os = b.dataset.os; save(); render(); }));
 document.getElementById("reset").addEventListener("click", () => { state.done = {}; state.open = STEPS[0].id; save(); render(); });
 
+document.getElementById("chip-steps").textContent = STEPS.length + " Schritte";
 render();
 </script>
 </body>
