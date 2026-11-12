@@ -54,15 +54,15 @@
   @media (max-width: 760px) { .flow, .grid2 { grid-template-columns: 1fr; } section { padding: 20px 18px; } td:first-child { white-space: normal; } }
 </style>
 </head>
-<body>
+<body data-sections='[["ablauf","Ablauf"],["payload","Payload"],["felder","Felder"],["punkte","Punkte"],["datenschutz","Datenschutz"],["offen","Offen"]]'>
 <div class="wrap">
   <header>
-    <span class="tag">Prototyp · Datenstruktur</span> <a href="./" style="margin-left:10px;font-weight:700;color:var(--petrol)">← Zum SpeedyBoarding</a> <a href="results.html" style="margin-left:10px;font-weight:700;color:var(--petrol)"><span class="emo">📊</span>Team-Ansicht</a>
+    <span class="tag">Prototyp · Datenstruktur</span>
     <h1><i>SpeedyBoarding</i> – Datenstruktur</h1>
     <p class="lead">Welche Daten die Teilnehmenden im SpeedyBoarding eingeben, wie sie im Browser gespeichert werden und in welchem Format sie später bei uns ankommen sollen. Alles auf dieser Seite wird live aus <code>schema.js</code> erzeugt, der einzigen Quelle für IDs und Punkte.</p>
   </header>
 
-  <section>
+  <section id="ablauf">
     <span class="eyebrow">Ablauf</span>
     <h2>Woher die Daten kommen</h2>
     <div class="flow">
@@ -75,7 +75,7 @@
     <div class="note warn"><span class="emo">🧪</span>Diese Seite gehört zum Prototyp und wird später entfernt. Sie zeigt nur Beispieldaten oder den Spielstand im eigenen Browser, keine Daten anderer Teilnehmender.</div>
   </section>
 
-  <section>
+  <section id="payload">
     <span class="eyebrow">Übertragungsformat</span>
     <h2>Payload – so sollen die Daten ankommen</h2>
     <div class="tabs" role="group">
@@ -92,7 +92,7 @@
     <p id="liveHint" class="note info" hidden>Tipp: In einem zweiten Tab <a href="./">SpeedyBoarding</a> durchspielen und hier auf „Neu laden“ klicken.</p>
   </section>
 
-  <section>
+  <section id="felder">
     <span class="eyebrow">Feldreferenz</span>
     <h2>Felder im Payload</h2>
     <table>
@@ -101,7 +101,7 @@
     </table>
   </section>
 
-  <div class="grid2">
+  <div class="grid2" id="punkte">
     <section style="margin:0">
       <span class="eyebrow">Punkte</span>
       <h2>Aufgaben &amp; Endboss</h2>
@@ -114,7 +114,7 @@
     </section>
   </div>
 
-  <section>
+  <section id="datenschutz">
     <span class="eyebrow">Datenschutz &amp; Sicherheit</span>
     <h2>Woran wir gedacht haben – und was noch zu tun ist</h2>
     <table>
@@ -136,7 +136,7 @@
     </table>
   </section>
 
-  <section>
+  <section id="offen">
     <span class="eyebrow">Offen</span>
     <h2>Entscheidungen fürs Dev-Team</h2>
     <ul class="q">
@@ -151,6 +151,7 @@
 </div>
 
 <script src="schema.js"></script>
+<script src="nav.js"></script>
 <script>
 const FIELDS = [
   ["schemaVersion", "number", "Version dieses Formats. Aktuell " + SB.SCHEMA_VERSION + "."],

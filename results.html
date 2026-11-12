@@ -108,7 +108,7 @@
   @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
 </style>
 </head>
-<body>
+<body data-sections='[["kpis","Übersicht"],["apps","Apps"],["rank","Wo hakt’s?"],["extras","Leaderboard"]]'>
 <div class="wrap">
   <header>
     <div>
@@ -116,12 +116,11 @@
       <h1><i>SpeedyBoarding</i> – Ergebnisse</h1>
       <p class="sub">Wer ist startklar fürs Product Management Bootcamp? Prototyp mit erfundenen Teilnehmenden.</p>
     </div>
-    <div class="links"><a href="./">← Zum SpeedyBoarding</a><a href="intern.html"><span class="emo">🛠️</span>Datenstruktur</a></div>
   </header>
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="card">
+  <div class="card" id="apps">
     <div class="toolbar">
       <input type="search" id="q" placeholder="Name oder E-Mail suchen …" aria-label="Suchen">
       <label><input type="checkbox" id="open"> Nur noch nicht fertige</label>
@@ -139,7 +138,7 @@
 
   <div class="card" id="rank"></div>
 
-  <div class="grid2">
+  <div class="grid2" id="extras">
     <div class="card">
       <h2><span class="emo">🏆</span>Leaderboard-Vorschau</h2>
       <p class="sub">So sehen es die Teilnehmenden: nur Gamer-Namen, nur wer im SpeedyBoarding zugestimmt hat. <strong id="lbInfo"></strong></p>
@@ -159,6 +158,7 @@
 </div>
 
 <script src="schema.js"></script>
+<script src="nav.js"></script>
 <script>
 const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/";
 const ICONS = { google: "google", slack: "slack", miro: "miro", figma: "figma", jira: "jira", claude: "claude", chatgpt: "openai", github: "github" };
