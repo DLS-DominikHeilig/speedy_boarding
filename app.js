@@ -300,6 +300,7 @@ function viewStart() {
   const greet = state.name ? `Hi ${esc(firstName())}!<span class="emo emo-after">👋</span>` : "Hi!<span class='emo emo-after'>👋</span>";
   return `<main class="start"><div class="wrap start-grid">
     <div>
+      <img class="school-logo" src="assets/dl-school-logo.png" alt="Digitale Leute School" width="108" height="32">
       <span class="tag">Product Management Bootcamp · Vor dem Start</span>
       <h1>Wie bereit bist du, ein AI-Powered PM zu werden?</h1>
       <p class="lead">${greet} Bevor es losgeht, richtest du deine Werkzeuge ein. Sammle Punkte, besiege den Endboss – und starte startklar in die erste Session.</p>
@@ -645,6 +646,7 @@ function viewBoss() {
 
 function viewFinish() {
   return `${hud()}<main class="wrap"><div class="finish">
+    <img class="school-logo center" src="assets/dl-school-logo.png" alt="Digitale Leute School" width="108" height="32">
     <div class="badge">${sprite("trophy")}</div>
     <span class="eyebrow">${score()} / ${MAX} Punkte</span>
     <h1>${state.name ? `${esc(firstName())}, du bist bereit!` : "Du bist bereit!"}</h1>
