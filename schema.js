@@ -42,6 +42,7 @@ window.SB = (() => {
   const blank = () => ({
     name: "", email: "", tasks: {}, boss: {}, last: null,
     os: typeof navigator !== "undefined" && /Win/i.test(navigator.platform) ? "win" : "mac",
+    consent: null, // { accepted, at, policyUrl }
     updatedAt: null,
   });
   function load() {
@@ -76,6 +77,9 @@ window.SB = (() => {
     return {
       schemaVersion: SCHEMA_VERSION,
       participant: { name: st.name || null, defaultEmail: st.email || null },
+      consent: st.consent
+        ? { privacyNoticeAccepted: !!st.consent.accepted, acceptedAt: st.consent.at || null, policyUrl: st.consent.policyUrl || null }
+        : { privacyNoticeAccepted: false, acceptedAt: null, policyUrl: null },
       tools,
       github: {
         username: user,

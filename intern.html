@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex">
 <title>SpeedyBoarding · Intern: Datenstruktur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +57,7 @@
 <body>
 <div class="wrap">
   <header>
-    <span class="tag">Intern · nur fürs Team</span>
+    <span class="tag">Prototyp · Datenstruktur</span> <a href="./" style="margin-left:10px;font-weight:700;color:var(--petrol)">← Zum SpeedyBoarding</a>
     <h1><i>SpeedyBoarding</i> – Datenstruktur</h1>
     <p class="lead">Welche Daten die Teilnehmenden im SpeedyBoarding eingeben, wie sie im Browser gespeichert werden und in welchem Format sie später bei uns ankommen sollen. Alles auf dieser Seite wird live aus <code>schema.js</code> erzeugt, der einzigen Quelle für IDs und Punkte.</p>
   </header>
@@ -67,12 +67,12 @@
     <h2>Woher die Daten kommen</h2>
     <div class="flow">
       <div><strong>Magic Link</strong>Wir verschicken <code>…/?name=Vor%20Nach&amp;email=…</code>. Name und optional E-Mail werden übernommen und aus der URL entfernt.</div>
-      <div><strong>Eingaben</strong>Standard-E-Mail, E-Mail pro Tool, Google-Kontotyp, GitHub-Profil-Link, abgehakte Schritte.</div>
+      <div><strong>Eingaben</strong>Datenschutz-Haken, Standard-E-Mail, E-Mail pro Tool, Google-Kontotyp, GitHub-Profil-Link, abgehakte Schritte.</div>
       <div><strong>localStorage</strong>Alles liegt im Browser unter <code id="keyName"></code>. Es verlässt den Rechner derzeit <strong>nicht</strong>.</div>
       <div class="todo"><strong>Übertragung (offen)</strong><code>SB.payload(state)</code> liefert das JSON. Ziel noch festzulegen, z. B. Google Sheets per Apps Script.</div>
     </div>
     <div class="note danger"><span class="emo">🔒</span>Der GitHub-Token wird an keiner Stelle erfasst oder gespeichert. Die Seite fragt nur ab, ob er erstellt wurde. Das muss auch bei einer späteren Übertragung so bleiben.</div>
-    <div class="note warn"><span class="emo">⚠️</span>„Intern“ heißt hier nur: nicht verlinkt und für Suchmaschinen gesperrt. Auf GitHub Pages ist die Seite öffentlich erreichbar. Echte Teilnehmenden-Daten stehen hier nur, wenn sie im eigenen Browser liegen.</div>
+    <div class="note warn"><span class="emo">🧪</span>Diese Seite gehört zum Prototyp und wird später entfernt. Sie zeigt nur Beispieldaten oder den Spielstand im eigenen Browser, keine Daten anderer Teilnehmender.</div>
   </section>
 
   <section>
@@ -115,13 +115,33 @@
   </div>
 
   <section>
+    <span class="eyebrow">Datenschutz &amp; Sicherheit</span>
+    <h2>Woran wir gedacht haben – und was noch zu tun ist</h2>
+    <table>
+      <thead><tr><th>Thema</th><th>Stand im Prototyp</th><th>Für den Live-Betrieb</th></tr></thead>
+      <tbody>
+        <tr><td>Datenschutzerklärung</td><td>✓ Pflicht-Haken auf der Startseite mit Link zur <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung der DL School</a>. Zeitpunkt wird gespeichert.</td><td>Mit Datenschutz-Verantwortlichen klären: Die Verarbeitung dient der Kursdurchführung, ist also eher ein <em>Hinweis</em> (Vertrag) als eine <em>Einwilligung</em>. Ggf. SpeedyBoarding in der Erklärung ergänzen.</td></tr>
+        <tr><td>GitHub-Token</td><td>✓ Wird nie abgefragt oder gespeichert. Mehrfache Warnungen im Boss.</td><td>So beibehalten. Kein Feld für Tokens oder Passwörter, auch nicht „zur Hilfe“.</td></tr>
+        <tr><td>Datensparsamkeit</td><td>Pro Tool eine E-Mail, für GitHub nur der Benutzername.</td><td>E-Mails nur bei Tools erfassen, in die wir wirklich einladen. Bei reinen Selbst-Anmeldungen (z. B. ChatGPT) reicht ein Haken.</td></tr>
+        <tr><td>Externe Dienste</td><td>⚠️ Schriften (Google Fonts) und Logos (jsDelivr) werden von fremden Servern geladen. Dabei wird die IP-Adresse übertragen.</td><td>Schriften und Logos selbst hosten. Google Fonts von fremden Servern ist in Deutschland abgemahnt worden.</td></tr>
+        <tr><td>Hosting</td><td>GitHub Pages (US-Anbieter, Zugriffs-Logs mit IP).</td><td>Auf DL-Infrastruktur hosten oder in der Datenschutzerklärung aufführen.</td></tr>
+        <tr><td>Magic Link</td><td>Name steht im Klartext in der URL (<code>?name=</code>), wird nach dem Laden entfernt.</td><td>Stattdessen ein zufälliges, ablaufendes Token (<code>?t=…</code>). Name und E-Mail kommen vom Server. Keine personenbezogenen Daten in URLs, sonst landen sie in Verläufen und Logs.</td></tr>
+        <tr><td>Speicherung im Browser</td><td>Alles im localStorage. Bleibt auf geteilten Rechnern stehen.</td><td>Button „Meine Daten löschen“. Nach erfolgreicher Übertragung lokale Kopie leeren.</td></tr>
+        <tr><td>Übertragung</td><td>Noch keine.</td><td>Nur per HTTPS, mit dem Magic-Link-Token als Berechtigung. Serverseitig prüfen (E-Mail-Format, GitHub-Name) und Anfragen begrenzen, damit niemand fremde Daten einschleust.</td></tr>
+        <tr><td>Eingaben</td><td>✓ Name und Eingaben werden vor der Anzeige maskiert (Schutz vor eingeschleustem HTML/JS).</td><td>Serverseitig ebenso maskieren, z. B. vor dem Schreiben in Sheets (Formel-Injection mit <code>=</code>).</td></tr>
+        <tr><td>Löschfristen</td><td>–</td><td>Festlegen, wann Onboarding-Daten gelöscht werden, z. B. nach Kursende.</td></tr>
+        <tr><td>Screenshots im Repo</td><td>⚠️ <code>docs/img/</code> zeigt einen echten GitHub-Account und eine gekürzte E-Mail.</td><td>Vor dem Live-Gang durch neutrale Beispiel-Screenshots ersetzen.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
     <span class="eyebrow">Offen</span>
     <h2>Entscheidungen fürs Dev-Team</h2>
     <ul class="q">
       <li><strong>Ziel der Übertragung:</strong> Google Sheets (Apps Script Web-App), Airtable, CRM oder eigene API?</li>
       <li><strong>Zeitpunkt:</strong> nach jeder Aufgabe (Fortschritt live sichtbar) oder einmal am Ende?</li>
       <li><strong>Identifikation:</strong> Der Magic Link enthält bisher nur den Namen. Für eindeutige Zuordnung braucht es eine ID oder einen signierten Token im Link, z. B. <code>?id=…</code>.</li>
-      <li><strong>Datenschutz:</strong> Einwilligung bzw. Hinweis zur Verarbeitung der E-Mail-Adressen vor dem Absenden.</li>
       <li><strong>Prüfung:</strong> GitHub-Benutzernamen gegen <code>api.github.com/users/&lt;name&gt;</code> prüfen, ob das Profil existiert.</li>
       <li><strong>Versionierung:</strong> <code>schemaVersion</code> erhöhen, sobald sich Felder ändern.</li>
     </ul>
@@ -134,6 +154,9 @@ const FIELDS = [
   ["schemaVersion", "number", "Version dieses Formats. Aktuell " + SB.SCHEMA_VERSION + "."],
   ["participant.name", "string | null", "Vor- und Nachname aus dem Magic Link."],
   ["participant.defaultEmail", "string | null", "Standard-E-Mail von der Startseite. Wird bei jeder Aufgabe vorgeschlagen."],
+  ["consent.privacyNoticeAccepted", "boolean", "Haken „Datenschutzerklärung der DL School gelesen“ auf der Startseite. Ohne Haken geht es nicht weiter."],
+  ["consent.acceptedAt", "string (ISO 8601) | null", "Zeitpunkt, an dem der Haken gesetzt wurde."],
+  ["consent.policyUrl", "string | null", "Version bzw. URL der Datenschutzerklärung, die galt."],
   ...SB.TASKS.map(t => [`tools.${t.id}.done`, "boolean", `${t.name}: Aufgabe abgeschlossen (+${t.points} Punkte).`]),
   ...SB.TASKS.map(t => [`tools.${t.id}.email`, "string | null", `E-Mail, die für ${t.name} genutzt wird bzw. an die wir einladen.`]),
   ["tools.google.accountType", '"gmail" | "other" | "none" | null', "Art des Google-Kontos. „other“ = Google-Konto mit Nicht-Gmail-Adresse (Posteo, Proton, eigene Domain). „none“ = musste neu angelegt werden."],
@@ -152,6 +175,7 @@ const FIELDS = [
 // Beispielzustand: Lea hat 5 Aufgaben und 2 Treffer erledigt
 const EXAMPLE = Object.assign(SB.blank(), {
   name: "Lea Müller", email: "lea@posteo.de", os: "mac", updatedAt: "2026-11-12T10:42:00.000Z",
+  consent: { accepted: true, at: "2026-11-12T10:30:12.000Z", policyUrl: "https://school.digitale-leute.de/datenschutz" },
   tasks: {
     google: { done: true, email: "lea@posteo.de", has: "other" },
     slack: { done: true, email: "lea@posteo.de" },

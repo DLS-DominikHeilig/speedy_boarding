@@ -134,6 +134,10 @@
   .task { max-width: 760px; margin: 0 auto; padding: 28px 0 70px; }
   .emo { display: inline-block; margin-right: .3em; font-style: normal; }
   .emo-after { margin-right: 0; margin-left: .3em; }
+  .privacy { display: grid; gap: 8px; max-width: 520px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 18px; font-size: .92rem; }
+  .privacy small { color: var(--soft); font-size: .82rem; }
+  .devlink { margin: 16px 0 0; font-size: .85rem; }
+  .devlink a, .map-foot a { color: var(--soft); font-weight: 600; }
   .navrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .task-head { display: flex; gap: 18px; align-items: center; margin: 18px 0 22px; }
   .task-head .app-ico { width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); }
@@ -472,7 +476,13 @@ function viewStart() {
         <input id="mail" type="email" autocomplete="email" placeholder="name@beispiel.de" value="${esc(state.email)}">
         <small>Wir schlagen sie dir bei jeder Aufgabe vor. Du kannst sie pro Tool ändern.</small>
       </div>
+      <div class="privacy">
+        <label class="check" style="margin:0"><input type="checkbox" id="privacy" ${state.consent && state.consent.accepted ? "checked" : ""}>
+          <span>Ich habe die <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung der DL School</a> gelesen. Meine Angaben (Name, E-Mail-Adressen, GitHub-Benutzername) werden nur genutzt, um mich in die Bootcamp-Tools einzuladen.</span></label>
+        <small><span class="emo">🧪</span>Prototyp: Deine Angaben bleiben derzeit nur in deinem Browser.</small>
+      </div>
       <button class="btn btn-primary" id="go" type="button">${score() ? "Weiter zur Map" : "Los geht's"} →</button>
+      <p class="devlink"><a href="intern.html"><span class="emo">🛠️</span>Für Developer: Datenstruktur ansehen</a></p>
     </div>
     <div class="stage" aria-hidden="true">
       <div class="sky"></div>
@@ -521,7 +531,7 @@ function viewMap() {
       </button>
     </div>
     <div class="map-foot">
-      <span>Dein Fortschritt wird in diesem Browser gespeichert.</span>
+      <span>Dein Fortschritt wird in diesem Browser gespeichert. · <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a> · <a href="intern.html"><span class="emo">🛠️</span>Datenstruktur</a></span>
       ${score() === MAX ? `<a class="btn btn-dark" href="#finish">Zum Ziel<span class="emo emo-after">🏆</span></a>` : ""}
     </div>
   </main>`;
@@ -694,7 +704,8 @@ function viewFinish() {
 /* ---------- Router ---------- */
 const app = document.getElementById("app");
 function route() {
-  const h = location.hash || "#start";
+  let h = location.hash || "#start";
+  if (!(state.consent && state.consent.accepted)) h = "#start"; // ohne Datenschutz-Haken geht es nicht weiter
   if (h.startsWith("#task/")) { app.innerHTML = viewTask(h.slice(6)); state.last = h.slice(6); }
   else if (h === "#map") app.innerHTML = viewMap();
   else if (h === "#boss") { app.innerHTML = viewBoss(); state.last = "github"; }
@@ -723,11 +734,18 @@ function parseGitHub(v) {
 function bind() {
   const mail = document.getElementById("mail");
   const goBtn = document.getElementById("go");
-  if (goBtn) goBtn.onclick = () => {
-    const v = mail.value.trim();
-    if (v && !validEmail(v)) { mail.classList.add("bad"); mail.focus(); return; }
-    state.email = v; save(); go("#map");
-  };
+  const priv = document.getElementById("privacy");
+  if (goBtn) {
+    const upd = () => { goBtn.disabled = !priv.checked; };
+    priv.onchange = upd; upd();
+    goBtn.onclick = () => {
+      const v = mail.value.trim();
+      if (v && !validEmail(v)) { mail.classList.add("bad"); mail.focus(); return; }
+      if (!priv.checked) return;
+      if (!(state.consent && state.consent.accepted)) state.consent = { accepted: true, at: new Date().toISOString(), policyUrl: "https://school.digitale-leute.de/datenschutz" };
+      state.email = v; save(); go("#map");
+    };
+  }
 
   // Aufgabe
   const tdone = document.getElementById("tdone");
