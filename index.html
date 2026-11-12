@@ -135,6 +135,16 @@
   .boss-card.defeated { border-color: var(--petrol); background: #F3FAF8; }
   .boss-card .cursor { position: absolute; left: 90px; bottom: 6px; }
 
+  .lb-page { min-height: 100vh; display: grid; place-items: center; padding: 40px 0; }
+  .lb-big { max-width: 620px; margin: 0 auto; padding: 36px 36px 30px; text-align: left; }
+  .lb-big h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); margin: 8px 0 12px; }
+  .lb-trophy { width: 84px; margin-bottom: 18px; animation: bob 2.4s ease-in-out infinite; }
+  .lead-lb { color: var(--muted); font-size: 1.05rem; margin: 0 0 18px; }
+  .lb-foot { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+  .lb-later { text-align: center; color: var(--soft); font-size: .88rem; margin-top: 14px; }
+  .lb-strip { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 10px 16px; background: rgba(255,255,255,.7); border: 1px dashed #d6d6d6; border-radius: 12px; font-size: .92rem; color: var(--muted); }
+  .lb-strip a { margin-left: auto; }
+  .lb-mini { width: 22px; flex: none; }
   .lb-card { margin-top: 22px; padding: 20px 24px; }
   .lb-row { display: flex; gap: 18px; align-items: flex-start; }
   .lb-ico { width: 54px; flex: none; margin-top: 4px; }
@@ -546,30 +556,41 @@ function viewStart() {
 const GN_A = ["Pixel", "Turbo", "Agile", "Mega", "Retro", "Sprint", "Backlog", "Roadmap", "Neon", "Quantum", "Ninja", "Laser"];
 const GN_B = ["PM", "Owner", "Boss", "Hero", "Wizard", "Pilot", "Ranger", "Captain", "Explorer", "Builder"];
 const randomGamerName = () => GN_A[Math.floor(Math.random() * GN_A.length)] + GN_B[Math.floor(Math.random() * GN_B.length)] + (10 + Math.floor(Math.random() * 90));
-function leaderboardCard() {
-  const lb = state.leaderboard;
-  if (lb && lb.optIn) return `<section class="card lb-card">
-    <div class="lb-row"><span class="lb-ico">${sprite("trophy")}</span>
-      <div style="flex:1"><span class="eyebrow">Leaderboard · freiwillig</span>
-        <p style="margin:4px 0 0">Du erscheinst im Leaderboard als <strong>${esc(lb.gamerName)}</strong>. Dein echter Name bleibt verborgen.</p></div>
-      <div class="lb-actions"><button class="btn btn-ghost" type="button" id="lbEdit">Ändern</button><button class="btn btn-ghost" type="button" id="lbOut">Austreten</button></div>
-    </div></section>`;
-  const name = (lb && lb.draft) || "";
-  return `<section class="card lb-card">
-    <div class="lb-row"><span class="lb-ico">${sprite("trophy")}</span>
-      <div style="flex:1">
-        <span class="eyebrow">Leaderboard · freiwillig</span>
-        <h3 style="font-size:1.3rem;margin:4px 0 6px">Willst du ins Leaderboard?</h3>
-        <p style="margin:0 0 12px;color:var(--muted)">Andere Teilnehmende sehen dort nur deinen <strong>Gamer-Namen</strong> und deine Punkte, nicht deinen echten Namen. Du kannst jederzeit wieder austreten.</p>
-        <div class="lb-form">
-          <input type="text" id="gn" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Dein Gamer-Name" value="${esc(name)}" aria-label="Gamer-Name">
-          <button class="btn btn-ghost lb-dice" type="button" id="gnDice" title="Zufälligen Namen vorschlagen"><span class="emo">🎲</span>Vorschlag</button>
-        </div>
-        <small id="gnHint" style="color:var(--soft)">3–20 Zeichen: Buchstaben, Ziffern, Leerzeichen, _ und -. Bitte nicht deinen echten Namen.</small>
-        <label class="check"><input type="checkbox" id="lbOk"> Ich möchte mit diesem Gamer-Namen im Leaderboard erscheinen.</label>
-        <div style="margin-top:14px"><button class="btn btn-primary" type="button" id="lbJoin">Ins Leaderboard</button></div>
+/* Zwischenseite nach dem Start: freiwillig, überspringbar */
+function viewLeaderboard() {
+  const lb = state.leaderboard || {};
+  const name = lb.optIn ? lb.gamerName : (lb.draft || "");
+  const body = lb.optIn ? `
+      <p class="lead-lb">Du erscheinst im Leaderboard als <strong>${esc(lb.gamerName)}</strong>. Dein echter Name bleibt verborgen.</p>
+      <div class="lb-actions"><button class="btn btn-ghost" type="button" id="lbEdit">Namen ändern</button><button class="btn btn-ghost" type="button" id="lbOut">Austreten</button></div>
+      <div class="lb-foot"><button class="btn btn-primary" type="button" data-go="#map">Weiter zur Map →</button></div>` : `
+      <p class="lead-lb">Andere Teilnehmende sehen dort nur deinen <strong>Gamer-Namen</strong> und deine Punkte, nicht deinen echten Namen. Du kannst jederzeit wieder austreten.</p>
+      <div class="lb-form">
+        <input type="text" id="gn" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Dein Gamer-Name" value="${esc(name)}" aria-label="Gamer-Name">
+        <button class="btn btn-ghost lb-dice" type="button" id="gnDice" title="Zufälligen Namen vorschlagen"><span class="emo">🎲</span>Vorschlag</button>
       </div>
-    </div></section>`;
+      <small id="gnHint" style="color:var(--soft)">3–20 Zeichen: Buchstaben, Ziffern, Leerzeichen, _ und -. Bitte nicht deinen echten Namen.</small>
+      <label class="check"><input type="checkbox" id="lbOk"> Ich möchte mit diesem Gamer-Namen im Leaderboard erscheinen.</label>
+      <div class="lb-foot">
+        <button class="btn btn-primary" type="button" id="lbJoin">Ins Leaderboard</button>
+        <button class="btn btn-ghost" type="button" id="lbSkip">Überspringen →</button>
+      </div>`;
+  return `<main class="lb-page"><div class="wrap">
+    <section class="card lb-big">
+      <div class="lb-trophy">${sprite("trophy")}</div>
+      <span class="eyebrow">Leaderboard · freiwillig</span>
+      <h1>Willst du ins Leaderboard?</h1>
+      ${body}
+    </section>
+    <p class="lb-later">Du kannst das jederzeit später auf der Map ändern.</p>
+  </div></main>`;
+}
+
+/* Kurze Statuszeile auf der Map */
+function leaderboardStrip() {
+  const lb = state.leaderboard;
+  const txt = lb && lb.optIn ? `Du bist im Leaderboard als <strong>${esc(lb.gamerName)}</strong>.` : "Du bist nicht im Leaderboard.";
+  return `<div class="lb-strip"><span class="lb-mini">${sprite("trophy")}</span><span>${txt}</span><a href="#leaderboard">${lb && lb.optIn ? "Ändern" : "Doch mitmachen?"}</a></div>`;
 }
 
 function viewMap() {
@@ -605,7 +626,7 @@ function viewMap() {
         <div class="pts-col"><span class="pts">+${BOSS.points}</span></div>
       </button>
     </div>
-    ${leaderboardCard()}
+    ${leaderboardStrip()}
     <div class="map-foot">
       <span>Dein Fortschritt wird in diesem Browser gespeichert. · <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a> · <a href="intern.html"><span class="emo">🛠️</span>Datenstruktur</a> · <a href="results.html"><span class="emo">📊</span>Team-Ansicht</a></span>
       ${score() === MAX ? `<a class="btn btn-dark" href="#finish">Zum Ziel<span class="emo emo-after">🏆</span></a>` : ""}
@@ -786,6 +807,7 @@ function route() {
   else if (h === "#map") app.innerHTML = viewMap();
   else if (h === "#boss") { app.innerHTML = viewBoss(); state.last = "github"; }
   else if (h === "#finish") app.innerHTML = viewFinish();
+  else if (h === "#leaderboard") app.innerHTML = viewLeaderboard();
   else app.innerHTML = viewStart();
   save();
   window.scrollTo(0, 0);
@@ -820,7 +842,7 @@ function bind() {
       if (v && !validEmail(v)) { mail.classList.add("bad"); mail.focus(); return; }
       if (!priv.checked) return;
       if (!(state.consent && state.consent.accepted)) state.consent = { accepted: true, at: new Date().toISOString(), policyUrl: "https://school.digitale-leute.de/datenschutz" };
-      state.email = v; save(); go("#map");
+      state.email = v; save(); go(state.leaderboard && state.leaderboard.seen ? "#map" : "#leaderboard");
     };
   }
 
@@ -891,15 +913,17 @@ function bind() {
     ok.onchange = check;
     document.getElementById("gnDice").onclick = () => { gn.value = randomGamerName(); gn.oninput(); };
     join.onclick = () => {
-      state.leaderboard = { optIn: true, gamerName: gn.value.trim(), at: new Date().toISOString() };
-      save(); toast("🏆"); setTimeout(route, 700);
+      state.leaderboard = { optIn: true, gamerName: gn.value.trim(), at: new Date().toISOString(), seen: true };
+      save(); toast("🏆"); setTimeout(() => go("#map"), 800);
     };
     check();
   }
+  const lbSkip = document.getElementById("lbSkip");
+  if (lbSkip) lbSkip.onclick = () => { state.leaderboard = Object.assign(state.leaderboard || {}, { optIn: false, seen: true }); save(); go("#map"); };
   const lbOut = document.getElementById("lbOut");
   if (lbOut) {
-    lbOut.onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName }; save(); route(); };
-    document.getElementById("lbEdit").onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName }; save(); route(); document.getElementById("gn").focus(); };
+    lbOut.onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName, seen: true }; save(); route(); };
+    document.getElementById("lbEdit").onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName, seen: true }; save(); route(); document.getElementById("gn").focus(); };
   }
 
   // Allgemein
