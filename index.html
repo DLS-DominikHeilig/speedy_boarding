@@ -33,7 +33,7 @@
   .pixel { image-rendering: pixelated; shape-rendering: crispEdges; display: block; }
 
   /* ---------- Buttons & Bausteine ---------- */
-  .btn { display: inline-flex; align-items: center; gap: 10px; border: 0; cursor: pointer; border-radius: 10px; padding: 14px 22px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform .1s, box-shadow .2s; }
+  .btn { display: inline-block; border: 0; cursor: pointer; border-radius: 10px; padding: 14px 22px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform .1s, box-shadow .2s; }
   .btn:active { transform: translateY(1px); }
   .btn-primary { background: var(--teal); color: var(--dark); box-shadow: 0 4px 0 #00b9a6; }
   .btn-primary:hover { box-shadow: 0 6px 0 #00b9a6; transform: translateY(-1px); }
@@ -131,6 +131,8 @@
 
   /* ---------- Aufgabe ---------- */
   .task { max-width: 760px; margin: 0 auto; padding: 28px 0 70px; }
+  .emo { display: inline-block; margin-right: .3em; font-style: normal; }
+  .emo-after { margin-right: 0; margin-left: .3em; }
   .navrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .task-head { display: flex; gap: 18px; align-items: center; margin: 18px 0 22px; }
   .task-head .app-ico { width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); }
@@ -458,14 +460,14 @@ function nextStop(current) {
 function navRow(current) {
   const n = nextStop(current);
   const right = n
-    ? `<button class="btn btn-ghost" type="button" data-go="${n === "github" ? "#boss" : "#task/" + n}">${n === "github" ? "Zum Endboss" : "📋 Nächste Aufgabe: " + TASKS.find(t => t.id === n).name} →</button>`
-    : (score() === MAX ? `<button class="btn btn-ghost" type="button" data-go="#finish">Zum Ziel 🏆</button>` : "");
-  return `<nav class="navrow"><button class="btn btn-ghost" type="button" data-go="#map">← 🗺️ Zurück zur Map</button>${right}</nav>`;
+    ? `<button class="btn btn-ghost" type="button" data-go="${n === "github" ? "#boss" : "#task/" + n}">${n === "github" ? "Zum Endboss" : "<span class='emo'>📋</span>Nächste Aufgabe: " + TASKS.find(t => t.id === n).name} →</button>`
+    : (score() === MAX ? `<button class="btn btn-ghost" type="button" data-go="#finish">Zum Ziel<span class="emo emo-after">🏆</span></button>` : "");
+  return `<nav class="navrow"><button class="btn btn-ghost" type="button" data-go="#map">← <span class="emo">🗺️</span>Zurück zur Map</button>${right}</nav>`;
 }
 
 /* ---------- Seiten ---------- */
 function viewStart() {
-  const greet = state.name ? `Hi ${esc(firstName())}! 👋` : "Hi! 👋";
+  const greet = state.name ? `Hi ${esc(firstName())}!<span class="emo emo-after">👋</span>` : "Hi!<span class='emo emo-after'>👋</span>";
   return `<main class="start"><div class="wrap start-grid">
     <div>
       <span class="tag">Product Management Bootcamp · Vor dem Start</span>
@@ -510,7 +512,7 @@ function viewMap() {
   }).join("");
   return `${hud()}<main class="wrap">
     <div class="map-head">
-      <div><span class="eyebrow">🗺️ Deine Map</span><h2>Wähle deine nächste Aufgabe</h2></div>
+      <div><span class="eyebrow"><span class="emo">🗺️</span>Deine Map</span><h2>Wähle deine nächste Aufgabe</h2></div>
       <div class="ready"><strong>${pct()} %</strong><span>bereit · ${rank()}</span></div>
     </div>
     <section class="world" aria-label="Aufgaben">
@@ -523,7 +525,7 @@ function viewMap() {
         <div>
           <span class="eyebrow">${bossDone ? "Besiegt" : "Endboss"}</span>
           <h3>GitHub</h3>
-          <p>${bossDone ? "Du hast den Endboss besiegt! 🎉" : "Der härteste Gegner. Fehler gehören dazu – jeder Treffer zählt."}</p>
+          <p>${bossDone ? "Du hast den Endboss besiegt!<span class='emo emo-after'>🎉</span>" : "Der härteste Gegner. Fehler gehören dazu – jeder Treffer zählt."}</p>
           <div class="hp"><span class="mono" style="font-size:12px;font-weight:700">HP</span><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span class="mono" style="font-size:12px">${hits}/4 Treffer</span></div>
         </div>
         <div class="pts-col"><span class="pts">+${BOSS.points}</span></div>
@@ -532,7 +534,7 @@ function viewMap() {
     </div>
     <div class="map-foot">
       <span>Dein Fortschritt wird in diesem Browser gespeichert.</span>
-      ${score() === MAX ? `<a class="btn btn-dark" href="#finish">Zum Ziel 🏆</a>` : ""}
+      ${score() === MAX ? `<a class="btn btn-dark" href="#finish">Zum Ziel<span class="emo emo-after">🏆</span></a>` : ""}
     </div>
   </main>`;
 }
@@ -565,9 +567,9 @@ function viewTask(id) {
           <li>Bei der Frage nach der E-Mail-Adresse auf <strong>„Stattdessen meine aktuelle E-Mail-Adresse verwenden“</strong> klicken. So brauchst du kein Gmail-Postfach.</li>
           <li>Deine bestehende Adresse eingeben, den Bestätigungscode aus deinem Postfach eintragen und fertig.</li>
         </ol>
-        <div class="note info">💡 Lieber ein Gmail-Postfach? Geht natürlich auch – dann einfach eine neue Gmail-Adresse wählen.</div>
+        <div class="note info"><span class="emo">💡</span>Lieber ein Gmail-Postfach? Geht natürlich auch – dann einfach eine neue Gmail-Adresse wählen.</div>
       </div>
-      <div class="note warn">⚠️ Bitte <strong>keine Arbeits-Adresse</strong> deines aktuellen Arbeitgebers. Die kann Kurse blockieren, und bei einem Jobwechsel ist der Zugang weg.</div>
+      <div class="note warn"><span class="emo">⚠️</span>Bitte <strong>keine Arbeits-Adresse</strong> deines aktuellen Arbeitgebers. Die kann Kurse blockieren, und bei einem Jobwechsel ist der Zugang weg.</div>
     </div>` : `
     <div class="card panel">
       <h2>So geht's</h2>
@@ -575,7 +577,7 @@ function viewTask(id) {
     </div>`;
   return `${hud()}<main class="wrap"><div class="task">
     ${navRow(t.id)}
-    <div class="task-head">${appIcon(t)}<div><span class="eyebrow">📋 Aufgabe · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
+    <div class="task-head">${appIcon(t)}<div><span class="eyebrow"><span class="emo">📋</span>Aufgabe · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
     <p style="font-size:1.08rem;color:var(--muted);margin:0">${t.why}</p>
     ${body}
     <div class="card panel">
@@ -618,10 +620,10 @@ function viewBoss() {
       <div class="boss-sprite" id="bossSprite">${sprite(hits === 4 ? "bossDown" : "boss")}</div>
     </div>
     <div class="calm">
-      <strong>Fehler passieren hier – alles easy. 🙌</strong>
+      <strong>Fehler passieren hier – alles easy.<span class="emo emo-after">🙌</span></strong>
       Fragt eure KI des Vertrauens. Wenn etwas nicht gleich funktioniert, probiert es nochmal – oder macht erst mit der nächsten Aufgabe weiter und kommt später zurück.
     </div>
-    <details class="help"><summary>🤖 Joker: Fertiger Prompt für deine KI</summary>${codeBox(AI_PROMPT)}<div class="note danger" style="margin-top:8px">🔒 Niemals deinen Token in einen Chat kopieren – auch nicht in eine KI.</div></details>
+    <details class="help"><summary><span class="emo">🤖</span>Joker: Fertiger Prompt für deine KI</summary>${codeBox(AI_PROMPT)}<div class="note danger" style="margin-top:8px"><span class="emo">🔒</span>Niemals deinen Token in einen Chat kopieren – auch nicht in eine KI.</div></details>
 
     ${hitPanel(H[0], 0, `
       <ol class="steps">
@@ -645,13 +647,13 @@ function viewBoss() {
           <li>Warten, bis <strong>„Die Software wurde installiert“</strong> erscheint. Das kann bis zu 45 Minuten dauern. Nicht auf „Stoppen“ klicken.</li>
           <li>Nochmal <code>git --version</code> eingeben – jetzt sollte eine Version erscheinen.</li>
         </ol>
-        <div class="note info">💡 Homebrew ist keine Abkürzung – es lädt genau dasselbe Paket.</div>` : `
+        <div class="note info"><span class="emo">💡</span>Homebrew ist keine Abkürzung – es lädt genau dasselbe Paket.</div>` : `
         <ol class="steps">
           <li><a href="https://git-scm.com/download/win" target="_blank" rel="noopener">Git for Windows</a> herunterladen.</li>
           <li>Installer ausführen, alle Standardeinstellungen lassen.</li>
           <li>PowerShell öffnen (Start → „PowerShell“) und prüfen:${codeBox("git --version")}</li>
         </ol>
-        <div class="note info">💡 „git is not recognized“? PowerShell schließen und neu öffnen.</div>`}
+        <div class="note info"><span class="emo">💡</span>„git is not recognized“? PowerShell schließen und neu öffnen.</div>`}
       <p style="margin:14px 0 6px">Einmalig deinen Namen setzen (sonst gibt's beim ersten Commit einen Fehler):</p>
       ${codeBox(`git config --global user.name "${state.name || "Dein Name"}"\ngit config --global user.email "${state.email || "deine@email.de"}"`)}`)}
 
@@ -665,7 +667,7 @@ function viewBoss() {
         <li>Ganz unten <strong>Generate token</strong> klicken und den Token (<code>ghp_…</code>) mit dem Kopier-Symbol kopieren.</li>
         <li>Die Seite offen lassen, bis Treffer 4 geschafft ist – der Token wird nur einmal angezeigt.</li>
       </ol>
-      <div class="note danger">🔒 Der Token ist wie ein Passwort: nie in Slack, Chats, KI-Tools, Screenshots oder Dateien – und auch <strong>nicht hier</strong> eintragen.</div>`)}
+      <div class="note danger"><span class="emo">🔒</span>Der Token ist wie ein Passwort: nie in Slack, Chats, KI-Tools, Screenshots oder Dateien – und auch <strong>nicht hier</strong> eintragen.</div>`)}
 
     ${hitPanel(H[3], 3, `
       <p style="margin:0 0 10px">Jetzt lädst du zum ersten Mal etwas hoch. Am einfachsten lässt du Claude die Vorarbeit machen.</p>
@@ -675,9 +677,9 @@ function viewBoss() {
         <li>Claude nennt dir den Push-Befehl. Im Terminal ausführen – <strong>erst dann</strong> erscheint:${codeBox(`Password for 'https://${user || "DEIN-NAME"}@github.com':`)}</li>
         <li>Jetzt den Token einfügen (${mac ? "<strong>Cmd + V</strong>" : "<strong>Rechtsklick</strong>"}) und <strong>Enter</strong>.</li>
       </ol>
-      <div class="note warn">⚠️ <strong>Token nur einfügen, wenn <code>Password for …</code> dasteht.</strong> Steht am Zeilenanfang <code>${mac ? "name@Mac ~ %" : "PS C:\\Users\\name&gt;"}</code>, wartet das Terminal auf einen Befehl – dort nicht einfügen!</div>
-      <div class="note info">👀 <strong>Beim Einfügen erscheint nichts</strong> – keine Punkte, keine Sternchen. Das ist richtig so.</div>
-      <div class="note ok">✅ Geschafft, wenn am Ende steht:${codeBox("* [new branch]      main -> main\nbranch 'main' set up to track 'origin/main'.")}</div>
+      <div class="note warn"><span class="emo">⚠️</span><strong>Token nur einfügen, wenn <code>Password for …</code> dasteht.</strong> Steht am Zeilenanfang <code>${mac ? "name@Mac ~ %" : "PS C:\\Users\\name&gt;"}</code>, wartet das Terminal auf einen Befehl – dort nicht einfügen!</div>
+      <div class="note info"><span class="emo">👀</span><strong>Beim Einfügen erscheint nichts</strong> – keine Punkte, keine Sternchen. Das ist richtig so.</div>
+      <div class="note ok"><span class="emo">✅</span>Geschafft, wenn am Ende steht:${codeBox("* [new branch]      main -> main\nbranch 'main' set up to track 'origin/main'.")}</div>
       <details class="help"><summary>Es klappt nicht?</summary><dl>
         <dt>Ich sehe den Token auf dem Bildschirm</dt><dd>Er ist in der falschen Zeile. <strong>Nicht Enter drücken.</strong> Ctrl + C, dann <code>clear</code>. Token auf GitHub löschen und einen neuen erstellen – ein sichtbarer Token gilt als verbraucht.</dd>
         <dt><code>fatal: not a git repository</code></dt><dd>Falscher Ordner. Erst mit <code>cd</code> in den Projektordner wechseln – oder Claude fragen, welcher Befehl passt.</dd>
@@ -696,8 +698,8 @@ function viewFinish() {
     <h1>${esc(firstName())}, du bist bereit!</h1>
     <p><span class="rank">${rank()}</span></p>
     <p style="color:var(--muted);font-size:1.1rem">Alle Werkzeuge sind eingerichtet und der Endboss liegt am Boden. Wir freuen uns auf die erste Session mit dir.</p>
-    <p style="margin-top:26px"><button class="btn btn-primary" type="button" data-copy="Ich bin AI-Powered-PM-ready! 🏆 ${score()}/${MAX} Punkte im SpeedyBoarding – GitHub-Endboss besiegt.">Für Slack kopieren 📋</button></p>
-    <p><button class="btn btn-ghost" type="button" data-go="#map">← 🗺️ Zurück zur Map</button></p>
+    <p style="margin-top:26px"><button class="btn btn-primary" type="button" data-copy="Ich bin AI-Powered-PM-ready! 🏆 ${score()}/${MAX} Punkte im SpeedyBoarding – GitHub-Endboss besiegt.">Für Slack kopieren<span class="emo emo-after">📋</span></button></p>
+    <p><button class="btn btn-ghost" type="button" data-go="#map">← <span class="emo">🗺️</span>Zurück zur Map</button></p>
   </div></main>`;
 }
 
