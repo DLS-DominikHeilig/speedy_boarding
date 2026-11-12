@@ -159,45 +159,52 @@ const STEPS = [
   {
     id: "github-token",
     title: "GitHub-Token erstellen",
-    why: "Beim ersten Push fragt Git im Terminal, wer du bist. Dein normales GitHub-Passwort funktioniert dort <strong>nicht</strong>. Du brauchst einen <strong>Token</strong>, eine Art Passwort nur für Git. Das machst du einmal.",
+    why: "Beim ersten Push fragt Git im Terminal nach einem Passwort. Dein normales GitHub-Passwort funktioniert dort <strong>nicht</strong>. Du brauchst einen <strong>Token</strong>, eine Art Passwort nur für Git. Das machst du einmal.",
     all: [
-      ["Auf <a href=\"https://github.com\" target=\"_blank\" rel=\"noopener\">github.com</a> einloggen."],
-      ["Oben rechts auf dein <strong>Profilbild</strong> klicken, dann <strong>Settings</strong>."],
-      ["Links ganz nach unten scrollen, dann <strong>Developer settings</strong>."],
-      ["<strong>Personal access tokens</strong>, dann <strong>Tokens (classic)</strong>."],
-      ["<strong>Generate new token</strong>, dann <strong>Generate new token (classic)</strong>."],
-      ["Ausfüllen: <strong>Note</strong> z. B. <code>Mein Laptop</code>, <strong>Expiration</strong> mindestens bis Kursende (z. B. 90 days), bei <strong>Select scopes</strong> den Haken bei <code>repo</code> setzen."],
-      ["Unten auf <strong>Generate token</strong> klicken und den Code, der mit <code>ghp_</code> beginnt, <strong>sofort kopieren</strong>."],
+      ["Bei <a href=\"https://github.com\" target=\"_blank\" rel=\"noopener\">github.com</a> einloggen."],
+      ["<a href=\"https://github.com/settings/tokens/new?scopes=repo&description=PM%20Bootcamp\" target=\"_blank\" rel=\"noopener\"><strong>Diesen Link öffnen</strong></a>. Er füllt das Formular schon richtig vor."],
+      ["<strong>„Confirm access“:</strong> den Code aus der E-Mail von GitHub eingeben (Spam-Ordner prüfen!), dann <strong>Verify</strong>."],
+      ["Prüfen: <strong>Note</strong> <code>PM Bootcamp</code>, <strong>Expiration</strong> auf <strong>90 days</strong> umstellen (GitHub stellt jedes Mal 30 ein), bei <strong>Select scopes</strong> nur <code>repo</code> angehakt, alles andere leer."],
+      ["Nach unten scrollen, dann <strong>Generate token</strong>."],
+      ["Den Token (<code>ghp_…</code>) mit dem <strong>Kopier-Symbol</strong> kopieren. Die Seite offen lassen, bis der nächste Schritt geklappt hat."],
     ],
     allNote: [
-      "⚠️ Der Token wird <strong>nur einmal</strong> angezeigt. Verpasst? Einfach einen neuen erstellen.",
-      "🔒 Wie ein Passwort behandeln: nicht in Slack, E-Mails oder Dateien teilen.",
+      "⛔ <strong>Nicht „No expiration“</strong> wählen. Ein Token ohne Ablaufdatum gilt ewig, falls er in falsche Hände gerät.",
+      "🔒 Wie ein Passwort behandeln: nie in Slack, E-Mails, Chats, Screenshots oder Dateien teilen.",
     ],
   },
   {
     id: "github-login",
     title: "Im Terminal bei GitHub anmelden",
-    why: "Das passiert beim ersten Push, egal ob du ihn selbst startest oder Claude. Danach merkt sich dein Rechner die Anmeldung.",
+    why: "Das passiert beim ersten Push. Danach merkt sich dein Rechner die Anmeldung, und Claude kann ohne Nachfrage pushen.",
     all: [
-      ["Im Terminal erscheint:", "Username for 'https://github.com':"],
-      ["Ins Terminal klicken, deinen <strong>GitHub-Benutzernamen</strong> eintippen (nicht die E-Mail) und <strong>Enter</strong> drücken."],
+      ["<strong>Einmal vorbereiten:</strong> Claude bitten: <em>„Trag meinen GitHub-Benutzernamen in die Remote-URL ein.“</em> Dann fragt Git nur noch nach dem Token, nicht zusätzlich nach dem Benutzernamen."],
+      ["In den Projektordner wechseln und pushen (ein Befehl):", "cd ~/Pfad/zu/deinem-projekt && git push -u origin main"],
+      ["<strong>Erst jetzt</strong> erscheint:", "Password for 'https://DEINNAME@github.com':"],
     ],
-    mac: [],
-    win: [],
     after: {
-      mac: [["Bei <code>Password for …</code> den <strong>Token</strong> einfügen (<strong>Cmd + V</strong>) und <strong>Enter</strong> drücken."]],
-      win: [["Bei <code>Password for …</code> den <strong>Token</strong> einfügen (<strong>Rechtsklick</strong>) und <strong>Enter</strong> drücken."]],
+      mac: [["Den Token mit <strong>Cmd + V</strong> einfügen und <strong>Enter</strong> drücken."]],
+      win: [["Den Token mit <strong>Rechtsklick</strong> einfügen und <strong>Enter</strong> drücken."]],
       all: [["Geklappt, wenn am Ende so etwas steht:", "* [new branch]      main -> main\nbranch 'main' set up to track 'origin/main'."]],
     },
-    allNote: ["👀 <strong>Beim Einfügen erscheint nichts</strong>, keine Punkte, keine Sternchen. Das ist normal: einmal einfügen, Enter."],
+    allNote: [
+      "⚠️ <strong>Token nur einfügen, wenn <code>Password for …</code> dasteht.</strong> Steht am Zeilenanfang <code>deinname@Mac ~ %</code>, wartet das Terminal auf einen Befehl. Dort <strong>nicht</strong> einfügen!",
+      "👀 <strong>Beim Einfügen erscheint nichts</strong>, das ist richtig so. <strong>Siehst du den Token, ist er in der falschen Zeile</strong>: siehe „Es klappt nicht?“.",
+    ],
     extra: `<details class="trouble"><summary>Es klappt nicht?</summary>
       <dl>
+        <dt>Der Token ist auf dem Bildschirm zu sehen</dt>
+        <dd><strong>Nicht Enter drücken.</strong> Ctrl + C (Taste ctrl, nicht cmd), dann <code>clear</code> eingeben. Den Token auf GitHub löschen (Delete) und einen neuen erstellen, denn ein sichtbarer Token gilt als verbraucht.</dd>
+        <dt><code>fatal: not a git repository</code></dt>
+        <dd>Falscher Ordner. Zuerst mit <code>cd</code> in den Projektordner wechseln.</dd>
+        <dt><code>Username for 'https://github.com':</code></dt>
+        <dd>Der Benutzername steht nicht in der Projekt-Adresse. Claude bitten, ihn einzutragen, oder den Benutzernamen <strong>tippen</strong> (nicht einfügen), Enter, und erst bei <code>Password</code> den Token einfügen.</dd>
         <dt><code>Authentication failed</code> / <code>Invalid username or token</code></dt>
-        <dd>Token falsch, abgelaufen oder ohne Haken bei <code>repo</code>. Neuen Token erstellen und Push erneut starten.</dd>
+        <dd>Token falsch, abgelaufen oder ohne <code>repo</code>. Neuen Token erstellen, Push erneut starten.</dd>
         <dt><code>Repository not found</code></dt>
-        <dd>Das Repo gibt es auf GitHub noch nicht oder der Name ist falsch geschrieben. Auf github.com prüfen.</dd>
-        <dt>Terminal fragt gar nicht, sondern bricht ab</dt>
-        <dd>Ein alter, falscher Login ist gespeichert. Mac: Schlüsselbundverwaltung öffnen, nach <code>github.com</code> suchen, Eintrag löschen, Push erneut starten.</dd>
+        <dd>Das Repo gibt es auf GitHub noch nicht oder der Name ist falsch geschrieben.</dd>
+        <dt>Die Frage nach dem Passwort erscheint doppelt</dt>
+        <dd>Zwei Push-Versuche laufen gleichzeitig. Ctrl + C (ggf. zweimal), <code>clear</code>, dann den Push einmal neu starten.</dd>
         <dt>Nach dem Einfügen passiert nichts</dt>
         <dd>Enter vergessen. Einmal Enter drücken.</dd>
       </dl></details>`,

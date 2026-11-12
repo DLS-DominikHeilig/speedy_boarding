@@ -72,47 +72,63 @@ Schon einen Account? Weiter zu Schritt 5.
 
 ## 5. GitHub mit deinem Rechner verbinden (Schritt für Schritt)
 
-**Worum geht es?** Wenn du (oder Claude) zum ersten Mal Code zu GitHub hochlädst („pushen“), fragt Git im Terminal: *Wer bist du?* Dein normales GitHub-Passwort funktioniert dort **nicht**. Stattdessen brauchst du einen **Token**, eine Art Passwort nur für Git. Das machst du **einmal**, danach merkt sich dein Rechner die Anmeldung.
+**Worum geht es?** Wenn du (oder Claude) zum ersten Mal Code zu GitHub hochlädst („pushen“), fragt Git im Terminal nach einem Passwort. Dein normales GitHub-Passwort funktioniert dort **nicht**. Stattdessen brauchst du einen **Token**, eine Art Passwort nur für Git. Das machst du **einmal**, danach merkt sich dein Rechner die Anmeldung.
 
-### Teil A: Token auf GitHub erstellen (ca. 2 Minuten)
+Dauer: ca. 5 Minuten.
 
-1. Auf [github.com](https://github.com) einloggen.
-2. Oben rechts auf dein **Profilbild** klicken, dann **Settings**.
-3. In der linken Spalte ganz nach unten scrollen, dann **Developer settings**.
-4. **Personal access tokens**, dann **Tokens (classic)**.
-5. Oben rechts auf **Generate new token**, dann **Generate new token (classic)**.
-6. Ausfüllen:
-   - **Note:** ein Name, z. B. `Mein Laptop`
-   - **Expiration:** wie lange der Token gilt, z. B. `90 days` (mindestens bis Kursende)
-   - **Select scopes:** Haken bei **`repo`** setzen (die anderen nicht nötig)
-7. Ganz unten auf **Generate token** klicken.
-8. Den grünen Code, der mit `ghp_` beginnt, **sofort kopieren**.
+### Teil A: Token auf GitHub erstellen
 
-> ⚠️ Der Token wird **nur einmal** angezeigt. Wenn du die Seite verlässt, ohne ihn kopiert zu haben, einfach einen neuen erstellen.
->
-> 🔒 Den Token wie ein Passwort behandeln: nicht in Slack, E-Mails oder Dateien teilen.
+1. Bei [github.com](https://github.com) einloggen.
+2. Diesen Link öffnen. Er füllt das Formular schon richtig vor:
+   👉 **https://github.com/settings/tokens/new?scopes=repo&description=PM%20Bootcamp**
+3. **„Confirm access“:** GitHub fragt zur Sicherheit noch einmal nach. Meist kommt ein **Code per E-Mail** (Spam-Ordner prüfen!), je nach Account auch per App oder Passkey. Code eingeben, dann **Verify** klicken.
+
+   ![Confirm access](docs/img/github-token-01-confirm-access.png)
+
+4. Das Formular prüfen:
+   - **Note:** `PM Bootcamp`, ein frei wählbarer Name, damit du den Token später wiedererkennst
+   - **Expiration:** **90 days** wählen. GitHub stellt bei jedem neuen Token wieder 30 Tage ein, also bitte umstellen. **Nicht „No expiration“**: Ein Token ohne Ablaufdatum gilt ewig, falls er in falsche Hände gerät.
+   - **Select scopes:** **nur `repo`** angehakt (die Unterpunkte werden automatisch mit angehakt). **Alles andere leer lassen.**
+
+   ![Token-Formular](docs/img/github-token-05-form-overview.png)
+
+5. Ganz nach unten scrollen, dann **Generate token** klicken.
+
+   ![Generate token](docs/img/github-token-04-generate-button.png)
+
+6. Den Token (beginnt mit `ghp_`) mit dem **Kopier-Symbol** daneben kopieren. **Die Seite offen lassen**, bis Teil B geklappt hat, denn der Token wird nur einmal angezeigt.
+
+> 🔒 Den Token wie ein Passwort behandeln: **nie** in Slack, E-Mails, Chats, Screenshots oder Dateien teilen.
 
 ### Teil B: Im Terminal anmelden
 
-Beim ersten Push erscheint im Terminal:
+**Einmal vorbereiten:** Damit Git nur nach dem Token fragt und nicht zusätzlich nach dem Benutzernamen, trägst du deinen GitHub-Benutzernamen in die Adresse deines Projekts ein. Am einfachsten bittest du Claude darum: *„Trag meinen GitHub-Benutzernamen in die Remote-URL ein.“* Oder du machst es selbst im Projektordner:
 
+```bash
+git remote set-url origin https://DEINNAME@github.com/DEINNAME/DEIN-REPO.git
 ```
-Username for 'https://github.com':
-```
 
-1. Ins Terminal klicken.
-2. Deinen **GitHub-Benutzernamen** eintippen (nicht die E-Mail) und **Enter** drücken.
-3. Jetzt erscheint:
-   ```
-   Password for 'https://deinname@github.com':
-   ```
-4. Den **Token** einfügen (Mac: Cmd + V, Windows: Rechtsklick) und **Enter** drücken.
+**Dann pushen:**
 
-> 👀 **Beim Einfügen erscheint nichts**, keine Punkte, keine Sternchen. Das ist normal. Einfach einmal einfügen und Enter drücken.
+1. Im Terminal in den Projektordner wechseln und pushen (ein Befehl):
+   ```bash
+   cd ~/Pfad/zu/deinem-projekt && git push -u origin main
+   ```
+2. **Erst jetzt** erscheint:
+   ```
+   Password for 'https://DEINNAME@github.com':
+   ```
+3. Den Token einfügen (Mac: **Cmd + V**, Windows: **Rechtsklick**) und **Enter** drücken.
+
+> ⚠️ **Der wichtigste Hinweis:** Den Token **nur** einfügen, wenn `Password for …` dasteht.
+> - Steht am Zeilenanfang `deinname@Mac ~ %` → das Terminal wartet auf einen **Befehl**. **Hier nicht einfügen!**
+> - Steht dort `Password for …` → **hier einfügen**.
+>
+> 👀 **Beim Einfügen erscheint nichts**, keine Punkte, keine Sternchen. Das ist richtig so. **Siehst du den Token, ist er in der falschen Zeile:** nicht Enter drücken, sondern siehe „Wenn es nicht klappt“.
 
 ### Hat es geklappt?
 
-Am Ende steht so etwas wie:
+Am Ende steht:
 
 ```
 To https://github.com/deinname/dein-projekt.git
@@ -120,16 +136,20 @@ To https://github.com/deinname/dein-projekt.git
 branch 'main' set up to track 'origin/main'.
 ```
 
-Fertig. Dein Code ist auf GitHub, und ab jetzt kann Claude ohne erneute Anmeldung pushen.
+Fertig. Dein Code ist auf GitHub, und ab jetzt kann Claude ohne erneute Anmeldung pushen. Der Mac hat den Token im Schlüsselbund gespeichert.
 
 ### Wenn es nicht klappt
 
-| Meldung | Bedeutung | Lösung |
+| Was du siehst | Bedeutung | Lösung |
 |---|---|---|
+| **Der Token ist auf dem Bildschirm zu sehen** | Er wurde in der falschen Zeile eingefügt (z. B. bei `Username` oder in der normalen Eingabezeile) | **Nicht Enter drücken.** **Ctrl + C** (Taste ctrl, nicht cmd), dann `clear` eingeben. Den Token auf GitHub **löschen** (Delete) und einen neuen erstellen, denn ein sichtbarer Token gilt als verbraucht. |
+| `fatal: not a git repository` | Du bist im falschen Ordner | Zuerst mit `cd` in den Projektordner wechseln (siehe Teil B, Schritt 1) |
+| `Username for 'https://github.com':` | Der Benutzername steht nicht in der Projekt-Adresse | Siehe „Einmal vorbereiten“ in Teil B. Oder Benutzernamen **tippen** (nicht einfügen), Enter, dann erst beim `Password` den Token einfügen. |
 | `Authentication failed` / `Invalid username or token` | Token falsch, abgelaufen oder ohne Haken bei `repo` | Neuen Token erstellen (Teil A) und den Push erneut starten |
 | `Repository not found` | Das Repo gibt es auf GitHub noch nicht oder der Name ist falsch geschrieben | Auf github.com prüfen, ob das Repo existiert und genauso heißt |
-| Terminal fragt gar nicht, sondern bricht ab | Ein alter, falscher Login ist gespeichert | Mac: Schlüsselbundverwaltung öffnen, nach `github.com` suchen, Eintrag löschen, Push erneut starten |
-| Es passiert nichts nach dem Einfügen | Enter vergessen | Einmal Enter drücken |
+| Die Frage nach dem Passwort erscheint doppelt oder durcheinander | Zwei Push-Versuche laufen gleichzeitig | **Ctrl + C** (ggf. zweimal), `clear`, dann den Push **einmal** neu starten |
+| Nach dem Einfügen passiert nichts | Enter vergessen | Einmal Enter drücken |
+| Nach 90 Tagen klappt der Push plötzlich nicht mehr | Token abgelaufen | Neuen Token erstellen. Beim nächsten Push fragt Git wieder nach dem Passwort. |
 
 ## 6. In der Claude-App arbeiten
 
