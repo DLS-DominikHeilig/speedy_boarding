@@ -131,6 +131,7 @@
 
   /* ---------- Aufgabe ---------- */
   .task { max-width: 760px; margin: 0 auto; padding: 28px 0 70px; }
+  .navrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .task-head { display: flex; gap: 18px; align-items: center; margin: 18px 0 22px; }
   .task-head .app-ico { width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); }
   .task-head .app-ico img { width: 36px; height: 36px; }
@@ -446,6 +447,22 @@ function osSwitch() {
 }
 const AI_PROMPT = "Ich richte gerade GitHub für mein Bootcamp ein und komme nicht weiter. Das habe ich gemacht: … Das steht im Terminal (ohne Token!): … Erkläre mir Schritt für Schritt, was ich tun soll. Ich bin kein:e Entwickler:in.";
 
+/* Nächste offene Aufgabe nach der aktuellen (in Map-Reihenfolge), am Ende der Boss */
+function nextStop(current) {
+  const order = [...TASKS.map(t => t.id), "github"];
+  const open = id => id === "github" ? bossHits().length < BOSS.hits.length : !taskDone(id);
+  const i = order.indexOf(current);
+  for (let k = 1; k < order.length; k++) { const id = order[(i + k) % order.length]; if (open(id)) return id; }
+  return null;
+}
+function navRow(current) {
+  const n = nextStop(current);
+  const right = n
+    ? `<button class="btn btn-ghost" type="button" data-go="${n === "github" ? "#boss" : "#task/" + n}">${n === "github" ? "Zum Endboss" : "📋 Nächste Aufgabe: " + TASKS.find(t => t.id === n).name} →</button>`
+    : (score() === MAX ? `<button class="btn btn-ghost" type="button" data-go="#finish">Zum Ziel 🏆</button>` : "");
+  return `<nav class="navrow"><button class="btn btn-ghost" type="button" data-go="#map">← 🗺️ Zurück zur Map</button>${right}</nav>`;
+}
+
 /* ---------- Seiten ---------- */
 function viewStart() {
   const greet = state.name ? `Hi ${esc(firstName())}! 👋` : "Hi! 👋";
@@ -493,7 +510,7 @@ function viewMap() {
   }).join("");
   return `${hud()}<main class="wrap">
     <div class="map-head">
-      <div><span class="eyebrow">Deine Map</span><h2>Wähle deine nächste Aufgabe</h2></div>
+      <div><span class="eyebrow">🗺️ Deine Map</span><h2>Wähle deine nächste Aufgabe</h2></div>
       <div class="ready"><strong>${pct()} %</strong><span>bereit · ${rank()}</span></div>
     </div>
     <section class="world" aria-label="Aufgaben">
@@ -557,8 +574,8 @@ function viewTask(id) {
       <ol class="steps">${t.steps.map(s => `<li>${s}</li>`).join("")}</ol>
     </div>`;
   return `${hud()}<main class="wrap"><div class="task">
-    <button class="btn btn-ghost" type="button" data-go="#map">← Zurück zur Map</button>
-    <div class="task-head">${appIcon(t)}<div><span class="eyebrow">Aufgabe · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
+    ${navRow(t.id)}
+    <div class="task-head">${appIcon(t)}<div><span class="eyebrow">📋 Aufgabe · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
     <p style="font-size:1.08rem;color:var(--muted);margin:0">${t.why}</p>
     ${body}
     <div class="card panel">
@@ -590,7 +607,7 @@ function viewBoss() {
   const user = (state.boss.account && state.boss.account.user) || "";
   const H = BOSS.hits;
   return `${hud()}<main class="wrap"><div class="task">
-    <button class="btn btn-ghost" type="button" data-go="#map">← Zurück zur Map</button>
+    ${navRow("github")}
     <div class="boss-hero">
       <div>
         <span class="eyebrow">Endboss · +100 Punkte</span>
@@ -680,7 +697,7 @@ function viewFinish() {
     <p><span class="rank">${rank()}</span></p>
     <p style="color:var(--muted);font-size:1.1rem">Alle Werkzeuge sind eingerichtet und der Endboss liegt am Boden. Wir freuen uns auf die erste Session mit dir.</p>
     <p style="margin-top:26px"><button class="btn btn-primary" type="button" data-copy="Ich bin AI-Powered-PM-ready! 🏆 ${score()}/${MAX} Punkte im SpeedyBoarding – GitHub-Endboss besiegt.">Für Slack kopieren 📋</button></p>
-    <p><button class="btn btn-ghost" type="button" data-go="#map">← Zurück zur Map</button></p>
+    <p><button class="btn btn-ghost" type="button" data-go="#map">← 🗺️ Zurück zur Map</button></p>
   </div></main>`;
 }
 
