@@ -46,14 +46,44 @@ window.SB = (() => {
     leaderboard: null, // { optIn, gamerName, at }
     updatedAt: null,
   });
+  /* Gespeicherten Zustand nur übernehmen, wenn die Form stimmt. Kaputte Teile fallen auf Standardwerte zurück. */
+  const isObj = v => v !== null && typeof v === "object" && !Array.isArray(v);
+  const str = v => (typeof v === "string" ? v : "");
+  function sanitize(raw) {
+    const st = blank();
+    if (!isObj(raw)) return st;
+    st.name = str(raw.name);
+    st.email = str(raw.email);
+    st.os = raw.os === "win" ? "win" : "mac";
+    st.last = typeof raw.last === "string" ? raw.last : null;
+    st.updatedAt = typeof raw.updatedAt === "string" ? raw.updatedAt : null;
+    if (isObj(raw.tasks)) TASKS.forEach(t => {
+      const x = raw.tasks[t.id];
+      if (isObj(x)) st.tasks[t.id] = { done: x.done === true, email: str(x.email), ...(typeof x.has === "string" ? { has: x.has } : {}) };
+    });
+    if (isObj(raw.boss)) BOSS.hits.forEach(h => {
+      const x = raw.boss[h.id];
+      if (isObj(x)) st.boss[h.id] = { done: x.done === true, ...(h.id === "account" && typeof x.user === "string" ? { user: x.user } : {}) };
+    });
+    if (isObj(raw.consent) && raw.consent.accepted === true) st.consent = { accepted: true, at: str(raw.consent.at), policyUrl: str(raw.consent.policyUrl) };
+    if (isObj(raw.leaderboard)) st.leaderboard = {
+      optIn: raw.leaderboard.optIn === true && validGamerName(raw.leaderboard.gamerName),
+      gamerName: str(raw.leaderboard.gamerName), draft: str(raw.leaderboard.draft),
+      at: str(raw.leaderboard.at), seen: raw.leaderboard.seen === true,
+    };
+    return st;
+  }
   function load() {
-    try { return Object.assign(blank(), JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}); }
+    try { return sanitize(JSON.parse(localStorage.getItem(STORAGE_KEY))); }
     catch { return blank(); }
   }
-  function save(state) {
-    state.updatedAt = new Date().toISOString();
+  /* touch = echter Fortschritt (aktualisiert updatedAt). Ohne Datenschutz-Haken wird nichts gespeichert. */
+  function save(state, touch = true) {
+    if (!(state.consent && state.consent.accepted)) return;
+    if (touch) state.updatedAt = new Date().toISOString();
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
   }
+  function clear() { try { localStorage.removeItem(STORAGE_KEY); } catch {} }
 
   const taskDone = (st, id) => !!(st.tasks[id] && st.tasks[id].done);
   const hitDone = (st, id) => !!(st.boss[id] && st.boss[id].done);
@@ -97,7 +127,21 @@ window.SB = (() => {
   }
 
   /* Gamer-Name: 3–20 Zeichen, Buchstaben/Ziffern/Leerzeichen/_/-, keine E-Mail */
-  const validGamerName = n => /^[\p{L}\p{N} _-]{3,20}$/u.test((n || "").trim());
+  const validGamerName = n => /^[\p{L}\p{N} _-]{3,20}$/u.test((typeof n === "string" ? n : "").trim());
 
-  return { validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
+  /* Enthält der Gamer-Name den echten Vor- oder Nachnamen als eigenes Wort?
+     „LeaRocks“, „lea_92“ → ja; „ScannerPM“ bei „Can“ → nein. */
+  function containsRealName(gamer, realName) {
+    const parts = str(realName).toLowerCase().split(/[\s-]+/).filter(x => x.length >= 2);
+    const words = str(gamer).replace(/([\p{Ll}\p{N}])(\p{Lu})/gu, "$1 $2").toLowerCase().split(/[^\p{L}]+/u).filter(Boolean);
+    const joined = words.join("");
+    return parts.some(p => words.includes(p)) || (parts.length > 1 && joined.includes(parts.join("")));
+  }
+
+  /* Gemeinsame Helfer für alle Seiten */
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/";
+  const ICONS = { google: "google", slack: "slack", miro: "miro", figma: "figma", jira: "jira", claude: "claude", chatgpt: "openai", github: "github" };
+
+  return { esc, ICON_CDN, ICONS, containsRealName, sanitize, clear, validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
 })();

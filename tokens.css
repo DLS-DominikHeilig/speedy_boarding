@@ -1,0 +1,12 @@
+/* SpeedyBoarding – gemeinsame Design-Tokens für alle Seiten */
+:root {
+  /* Hauptfarben (aus den Trainer-Hintergründen, geschätzt) */
+  --yellow: #F5C451; --petrol: #1B7A6A; --red: #F2284B; --blue: #6B9EF7;
+  /* Basis (von school.digitale-leute.de) */
+  --teal: #02F3DA; --text: #222222; --muted: #4F4F4F; --soft: #7F7F7F;
+  --bg: #F8F8F8; --dot: #E3E3E3; --card: #FFFFFF; --line: #E8E8E8; --dark: #222222;
+  --radius: 14px; --shadow: 0 2px 16px rgba(0,0,0,.07); --shadow-lg: 0 10px 40px rgba(0,0,0,.12);
+}
+/* Emoji mit Abstand in Schriftbreite */
+.emo { display: inline-block; margin-right: .3em; font-style: normal; }
+.emo-after { margin-right: 0; margin-left: .3em; }
