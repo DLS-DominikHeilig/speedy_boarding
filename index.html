@@ -405,7 +405,7 @@ Object.entries(ANIM).forEach(([name, a]) => Object.entries(a.frames).forEach(([k
   const v = SPRITES[name].slice(); v.splice(a.row, rows.length, ...rows); SPRITES[`${name}_${k}`] = v;
 }));
 const animSprite = name => `<span class="anim" data-anim="${name}">${sprite(name)}</span>`;
-const rnd = () => 500 + Math.random() * 500; // 0,5–1,0 s, unregelmäßig
+const rnd = () => 1000 + Math.random() * 500; // 1,0–1,5 s, unregelmäßig
 function startAnims() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   document.querySelectorAll("[data-anim]").forEach(el => {
