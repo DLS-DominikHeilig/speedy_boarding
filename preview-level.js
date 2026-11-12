@@ -18,7 +18,6 @@
 
   const deck = document.getElementById("deck");
   const howto = document.getElementById("howto");
-  const speed = document.getElementById("speed");
   const video = document.getElementById("video");
   const team = document.getElementById("team");
   let level = null;
@@ -59,7 +58,6 @@
       c.classList.toggle("flip", on);
     });
     howto.open = level < 2;
-    speed.hidden = level < 2;
     video.className = level === 0 ? "note hot" : "note info";
     document.getElementById("combo").classList.toggle("speedrun", level >= 2);
     renderTeam();
@@ -75,6 +73,7 @@
   confirm.addEventListener("change", ready);
   doneBtn.addEventListener("click", () => {
     status.innerHTML = '<span class="done-banner">✓ +50 Punkte (Demo)</span>';
+    doneBtn.dataset.done = "1";
     doneBtn.textContent = "Zur Map →";
   });
   deck.addEventListener("animationend", e => e.target.classList.remove("flip"));

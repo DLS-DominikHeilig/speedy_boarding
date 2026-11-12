@@ -26,6 +26,9 @@
   .felt h2.ask { color: #fff; }
   .felt.panel h2.ask span { color: rgba(255,255,255,.8); }
   .felt .deck.picked .pcard:not([aria-pressed="true"]) { opacity: .7; }
+  /* Test: inaktive Karten ohne Schlagschatten, solange nicht gehovert */
+  .deck.picked .pcard:not([aria-pressed="true"]):not(:hover) { box-shadow: none; }
+  .deck.picked .pcard:not([aria-pressed="true"]):hover { transform: translate(-1px, -3px); box-shadow: 3px 5px 0 var(--dark); }
   .panel h2.ask span { color: var(--soft); font-weight: 400; font-size: .92rem; letter-spacing: normal; margin-left: 6px; }
   .sub { color: var(--soft); font-size: .92rem; margin: 0 0 18px; }
   .task-head { display: flex; gap: 18px; align-items: center; margin: 18px 0 22px; }
@@ -70,7 +73,10 @@
   details.howto > summary::after { content: "▸"; font-family: "JetBrains Mono", monospace; color: var(--petrol); transition: transform .15s; }
   details.howto[open] > summary::after { transform: rotate(90deg); }
   details.howto[open] > summary { margin-bottom: 12px; }
-  .speed { font: 700 11px/1 "JetBrains Mono", monospace; background: var(--teal); padding: 4px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+  .show-btn { display: none; color: var(--petrol); font-size: .95rem; font-weight: 600; letter-spacing: normal; text-decoration: underline; text-underline-offset: 3px; margin-left: 12px; }
+  .show-btn:hover { color: var(--dark); }
+  details.howto:not([open]) > summary .show-btn { display: inline-block; }
+  details.howto:not([open]) > summary::after { content: none; }
 
   /* Deine Angabe */
   .field { display: grid; gap: 6px; margin: 0 0 6px; }
@@ -83,6 +89,7 @@
   .done-banner { font-weight: 700; color: var(--petrol); }
   .btn { border: 0; cursor: pointer; border-radius: 10px; padding: 14px 22px; font: 700 1rem Manrope, Arial, sans-serif; }
   .btn-primary { background: var(--teal); color: var(--dark); box-shadow: 0 4px 0 #00b9a6; }
+  .combo .btn-primary:disabled { background: var(--teal); color: var(--dark); box-shadow: 0 4px 0 #00b9a6; opacity: .45; }
   .btn-primary:disabled { background: var(--line); color: var(--soft); box-shadow: none; cursor: not-allowed; }
   /* So geht's + Deine Angabe nebeneinander in einem Block */
   .combo { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
@@ -133,7 +140,7 @@
   <section class="card panel combo" id="combo">
     <div class="col">
       <details class="howto" id="howto" open>
-        <summary><span>So geht's<span class="speed" id="speed" hidden>⚡ SPEEDRUN</span></span></summary>
+        <summary><span>So geht's<span class="show-btn">Anleitung zeigen</span></span></summary>
         <ol class="steps">
           <li>Auf <a href="https://www.figma.com/signup" target="_blank" rel="noopener">figma.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.</li>
           <li>Die E-Mail-Adresse deines Figma-Accounts bei „Deine Angabe“ eintragen.</li>
@@ -152,7 +159,7 @@
       <label class="check"><input type="checkbox" id="tconfirm"> Ich habe einen Figma-Account bzw. nutze diese Adresse für Figma.</label>
       <div class="task-actions">
         <span id="tstatus"></span>
-        <button class="btn btn-primary" id="tdone" type="button" disabled>Erledigt · +50</button>
+        <button class="btn btn-primary" id="tdone" type="button" disabled>Weiter · +50</button>
       </div>
     </div>
   </section>
