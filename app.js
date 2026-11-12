@@ -333,7 +333,7 @@ function viewStart() {
       <div class="coin" style="left:50%;top:28%;animation-delay:.6s">${sprite("coin")}</div>
       <div class="hero">${animSprite("hero")}</div>
       <div class="boss">${animSprite("boss")}<span style="position:absolute;left:55%;top:55%">${cursor("End Boss 49")}</span></div>
-      <div class="cursor" style="left:6%;top:40%">${cursor(firstName(), "var(--blue)").replace(/^<span class="cursor">|<\/span>$/g, "")}</div>
+      <div class="cursor flip" style="right:76%;bottom:48%">${cursor(firstName(), "var(--blue)").replace(/^<span class="cursor">|<\/span>$/g, "")}</div>
       <div class="ground"></div>
     </div>
   </div></main>`;

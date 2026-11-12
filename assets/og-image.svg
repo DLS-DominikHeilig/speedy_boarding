@@ -443,8 +443,8 @@
 <rect x="1056" y="445" width="11" height="11" fill="#B5122F"/>
 <rect x="1100" y="445" width="11" height="11" fill="#B5122F"/>
 </g>
-<g transform="translate(720,250)"><path d="M0 0 L26 13 L15 16 L10 27 Z" fill="#6B9EF7" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
-<rect x="18" y="22" width="54" height="30" rx="15" fill="#6B9EF7"/><text x="45.0" y="43" font-family="Avenir Next" font-weight="700" font-size="17" fill="#fff" text-anchor="middle">Du</text></g>
+<g><path d="M0 0 L26 13 L15 16 L10 27 Z" transform="translate(768,306) rotate(180)" fill="#6B9EF7" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="700" y="250" width="54" height="30" rx="15" fill="#6B9EF7"/><text x="727" y="271" font-family="Avenir Next" font-weight="700" font-size="17" fill="#fff" text-anchor="middle">Du</text></g>
 <g transform="translate(1030,420)"><path d="M0 0 L26 13 L15 16 L10 27 Z" fill="#F2284B" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
 <rect x="18" y="22" width="124" height="30" rx="15" fill="#F2284B"/><text x="80.0" y="43" font-family="Avenir Next" font-weight="700" font-size="17" fill="#fff" text-anchor="middle">End Boss 49</text></g>
 </svg>

@@ -107,6 +107,10 @@
   .stage .coin { position: absolute; width: 7%; animation: bob 1.6s ease-in-out infinite; }
   .stage .vs { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); font: 800 1.6rem Manrope; color: var(--red); letter-spacing: -0.04em; }
   .stage .cursor { position: absolute; }
+  /* Pfeil zeigt nach rechts unten auf die Figur, Label oben links */
+  .cursor.flip { flex-direction: row-reverse; align-items: flex-end; }
+  .cursor.flip svg { transform: rotate(180deg); }
+  .cursor.flip span { margin: 0 -4px 18px 0; }
   @keyframes bob { 50% { transform: translateY(-8px); } }
 
   /* ---------- Map ---------- */
