@@ -78,7 +78,13 @@
 
   /* ---------- Start ---------- */
   .start { min-height: 100vh; display: grid; place-items: center; padding: 48px 0; }
-  .start-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+  .start-grid { display: grid; grid-template-columns: 1.15fr .85fr; column-gap: 48px; row-gap: 0; align-items: start;
+    grid-template-areas: "head ." "title stage" "body stage" "priv cta"; }
+  .st-head { grid-area: head; } .st-title { grid-area: title; } .st-body { grid-area: body; }
+  .st-priv { grid-area: priv; margin: 8px 0 0; max-width: none; }
+  .st-cta { grid-area: cta; align-self: center; margin-top: 8px; }
+  .st-cta .devlink { margin-top: 14px; }
+  .st-stage { grid-area: stage; margin-top: 18px; align-self: start; }
   .start h1 { font-size: clamp(2.3rem, 6vw, 3.6rem); margin: 18px 0 18px; }
   .start p.lead { font-size: 1.12rem; color: var(--muted); margin: 0 0 22px; max-width: 520px; }
   .rules { display: grid; gap: 10px; margin: 0 0 26px; padding: 0; list-style: none; }
@@ -271,7 +277,9 @@
   .rank { display: inline-block; background: var(--yellow); padding: 6px 14px; border-radius: 8px; font-weight: 800; }
 
   @media (max-width: 860px) {
-    .start-grid { grid-template-columns: 1fr; gap: 28px; }
+    .start-grid { grid-template-columns: 1fr; grid-template-areas: "head" "title" "body" "stage" "priv" "cta"; row-gap: 0; }
+    .st-stage { margin: 8px 0 24px; }
+    .st-cta { margin-top: 18px; }
     .stage { max-width: 420px; }
     .stations { grid-template-columns: repeat(2, 1fr); }
     .boss-card { grid-template-columns: 110px 1fr; }

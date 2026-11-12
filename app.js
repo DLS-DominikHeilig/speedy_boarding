@@ -299,10 +299,12 @@ function navRow(current) {
 function viewStart() {
   const greet = state.name ? `Hi ${esc(firstName())}!<span class="emo emo-after">👋</span>` : "Hi!<span class='emo emo-after'>👋</span>";
   return `<main class="start"><div class="wrap start-grid">
-    <div>
+    <div class="st-head">
       <img class="school-logo" src="assets/dl-school-logo.png" alt="Digitale Leute School" width="108" height="32">
       <span class="tag">Product Management Bootcamp · Vor dem Start</span>
-      <h1>Wie bereit bist du, ein AI-Powered PM zu werden?</h1>
+    </div>
+    <h1 class="st-title">Wie bereit bist du, ein AI-Powered PM zu werden?</h1>
+    <div class="st-body">
       <p class="lead">${greet} Bevor es losgeht, richtest du deine Werkzeuge ein. Sammle Punkte, besiege den Endboss – und starte startklar in die erste Session.</p>
       <ul class="rules">
         <li><span class="ico" style="background:var(--yellow)">${sprite("coin")}</span><span><strong>${TASKS.length} Aufgaben</strong> in ${SB.WORLDS.length} Welten, à 50 Punkte – in beliebiger Reihenfolge</span></li>
@@ -314,15 +316,17 @@ function viewStart() {
         <input id="mail" type="email" autocomplete="email" placeholder="name@beispiel.de" value="${esc(state.email)}">
         <small>Wir schlagen sie dir bei jeder Aufgabe vor. Du kannst sie pro Tool ändern.</small>
       </div>
-      <div class="privacy">
+    </div>
+    <div class="privacy st-priv">
         <label class="check" style="margin:0"><input type="checkbox" id="privacy" ${state.consent && state.consent.accepted ? "checked" : ""}>
           <span>Ich habe die <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung der DL School</a> gelesen. Meine Angaben (Name, E-Mail-Adressen, GitHub-Benutzername) werden nur genutzt, um mich in die Bootcamp-Tools einzuladen.</span></label>
         <small><span class="emo">🧪</span>Prototyp: Deine Angaben bleiben derzeit nur in deinem Browser.</small>
-      </div>
+    </div>
+    <div class="st-cta">
       <button class="btn btn-primary" id="go" type="button">${score() ? "Weiter zur Map" : "Los geht's"} →</button>
       <p class="devlink"><a href="intern.html"><span class="emo">🛠️</span>Für Developer: Datenstruktur</a> · <a href="results.html"><span class="emo">📊</span>Team-Ansicht (Demo)</a></p>
     </div>
-    <div class="stage" aria-hidden="true">
+    <div class="stage st-stage" aria-hidden="true">
       <div class="sky"></div>
       <div class="coin" style="left:30%;top:28%">${sprite("coin")}</div>
       <div class="coin" style="left:40%;top:20%;animation-delay:.3s">${sprite("coin")}</div>
