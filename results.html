@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>SpeedyBoarding · Team-Ansicht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #F5C451; --petrol: #1B7A6A; --red: #F2284B; --blue: #6B9EF7; --teal: #02F3DA;
+    --text: #222; --muted: #4F4F4F; --soft: #8A8A8A; --bg: #F8F8F8; --dot: #E3E3E3; --line: #ECECEC; --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 Manrope, Arial, sans-serif; color: var(--text); background: var(--bg) radial-gradient(var(--dot) 1px, transparent 1px) 0 0 / 16px 16px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 80px; }
+  header { padding: 36px 0 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .tag { display: inline-block; background: #222; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: .8rem; font-weight: 700; }
+  .tag.demo { background: var(--yellow); color: #222; }
+  h1 { font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.04em; line-height: 1.05; margin: 12px 0 6px; font-weight: 800; }
+  h1 i { font-synthesis: style; }
+  h2 { font-size: 1.25rem; letter-spacing: -0.03em; margin: 0 0 4px; font-weight: 800; }
+  .sub { color: var(--muted); margin: 0; }
+  .links a { color: var(--petrol); font-weight: 700; margin-left: 14px; font-size: .9rem; }
+  .emo { display: inline-block; margin-right: .3em; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 22px 0; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 16px rgba(0,0,0,.05); }
+  .kpi strong { display: block; font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+  .kpi span { color: var(--muted); font-size: .88rem; }
+  .kpi.red strong { color: var(--red); } .kpi.petrol strong { color: var(--petrol); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,.05); padding: 18px 20px; margin: 16px 0; }
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .toolbar input[type=search] { font: inherit; padding: 9px 12px; border: 2px solid var(--line); border-radius: 10px; min-width: 220px; }
+  .toolbar input:focus { outline: none; border-color: var(--petrol); }
+  .toolbar label { display: flex; gap: 6px; align-items: center; font-weight: 600; font-size: .9rem; cursor: pointer; }
+  .toolbar label input { accent-color: var(--petrol); }
+  .spacer { flex: 1; }
+  button { font: inherit; font-weight: 700; font-size: .86rem; border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer; background: var(--bg); color: var(--text); }
+  button.primary { background: var(--teal); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 980px; }
+  th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: middle; }
+  th { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); font-weight: 700; white-space: nowrap; }
+  th.sort { cursor: pointer; user-select: none; }
+  th.sort:hover { color: var(--text); }
+  th .arr { margin-left: 3px; }
+  th img { width: 18px; height: 18px; display: block; margin: 0 auto 3px; opacity: .85; }
+  td.name, th.name { text-align: left; }
+  td.name strong { display: block; }
+  td.name small { color: var(--soft); }
+  tbody tr:hover { background: #FAFAFA; }
+  .prog { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+  .prog .bar { flex: 1; height: 8px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .prog .bar i { display: block; height: 100%; background: var(--petrol); }
+  .prog b { font: 700 12px "JetBrains Mono", monospace; width: 36px; text-align: right; }
+  .ok, .no { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; font-weight: 800; font-size: .8rem; }
+  .ok { background: #E3F4F0; color: var(--petrol); cursor: help; }
+  .no { background: var(--bg); color: #C9C9C9; }
+  .pips { display: inline-flex; gap: 3px; }
+  .pips i { width: 10px; height: 14px; border-radius: 2px; background: var(--line); }
+  .pips i.on { background: var(--red); }
+  .pips.full i { background: var(--petrol); }
+  .pts { font: 700 13px "JetBrains Mono", monospace; }
+  .when { color: var(--soft); font-size: .82rem; white-space: nowrap; }
+  .when.stale { color: var(--red); font-weight: 700; }
+  tfoot td { font: 700 12px "JetBrains Mono", monospace; color: var(--muted); border-bottom: 0; padding-top: 12px; }
+  tfoot td.name { font-family: Manrope; font-size: .82rem; }
+  .src { font-size: .7rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: var(--yellow); margin-left: 6px; vertical-align: 2px; }
+
+  .grid2 { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+  .lb { list-style: none; margin: 10px 0 0; padding: 0; counter-reset: lb; }
+  .lb li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); counter-increment: lb; }
+  .lb li::before { content: counter(lb); font: 700 13px "JetBrains Mono", monospace; width: 22px; color: var(--soft); }
+  .lb li:nth-child(-n+3)::before { color: var(--red); }
+  .lb .nm { flex: 1; font-weight: 700; }
+  .note { border-radius: 10px; padding: 12px 16px; margin-top: 12px; font-size: .9rem; }
+  .warn { background: #FEF6E0; } .info { background: #EEF4FF; }
+  textarea { width: 100%; min-height: 110px; font: 12.5px/1.5 "JetBrains Mono", monospace; border: 2px solid var(--line); border-radius: 10px; padding: 10px; }
+  details summary { cursor: pointer; font-weight: 700; }
+  @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="tag">Team-Ansicht</span> <span class="tag demo">Demo-Daten</span>
+      <h1><i>SpeedyBoarding</i> – Ergebnisse</h1>
+      <p class="sub">Wer ist startklar fürs Product Management Bootcamp? Prototyp mit erfundenen Teilnehmenden.</p>
+    </div>
+    <div class="links"><a href="./">← Zum SpeedyBoarding</a><a href="intern.html"><span class="emo">🛠️</span>Datenstruktur</a></div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Name oder E-Mail suchen …" aria-label="Suchen">
+      <label><input type="checkbox" id="open"> Nur noch nicht fertige</label>
+      <label><input type="checkbox" id="stale"> Nur inaktiv (&gt; 3 Tage)</label>
+      <span class="spacer"></span>
+      <button type="button" id="csv">CSV für Einladungen</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot id="tfoot"></tfoot>
+    </table></div>
+    <p class="note info"><span class="emo">💡</span>Fährst du über ein ✓, siehst du die E-Mail-Adresse für dieses Tool. Die CSV enthält pro Person und Tool die Adresse, an die eingeladen werden soll.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2><span class="emo">🏆</span>Leaderboard-Vorschau</h2>
+      <p class="sub">So könnte eine Rangliste für die Teilnehmenden aussehen: nur Vorname und Initial, nur wer zugestimmt hat.</p>
+      <ol class="lb" id="lb"></ol>
+      <div class="note warn"><span class="emo">⚖️</span><strong>Datenschutz:</strong> Für euch intern ist die Liste oben in Ordnung, ihr braucht die Daten für den Kurs. Eine Rangliste, die <em>andere Teilnehmende</em> sehen, ist eine zusätzliche Veröffentlichung. Dafür braucht es ein <strong>freiwilliges Opt-in</strong> („Ich möchte im Leaderboard erscheinen“), am besten mit selbst gewähltem Spitznamen. Ohne Opt-in nur anonyme Werte wie „Kohorte zu 68 % startklar“.</div>
+    </div>
+    <div class="card">
+      <h2><span class="emo">🧪</span>Eigene Daten testen</h2>
+      <p class="sub">Spiel das SpeedyBoarding in diesem Browser und füge deinen Spielstand als Zeile hinzu. Oder füge ein Payload-JSON von der Datenstruktur-Seite ein.</p>
+      <div class="toolbar" style="margin-top:12px"><button type="button" class="primary" id="mine">Meinen Spielstand hinzufügen</button><button type="button" id="reset">Zurücksetzen</button></div>
+      <details><summary>JSON einfügen</summary>
+        <textarea id="json" placeholder='{"schemaVersion":1, "participant": {...}, ...}'></textarea>
+        <div class="toolbar" style="margin-top:8px"><button type="button" id="addjson">Hinzufügen</button><span id="jsonmsg" class="sub"></span></div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script src="schema.js"></script>
+<script>
+const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/";
+const ICONS = { google: "google", slack: "slack", miro: "miro", figma: "figma", jira: "jira", claude: "claude", chatgpt: "openai", github: "github" };
+const DAY = 864e5, NOW = Date.now();
+
+/* ---------- Demo-Kohorte (erfundene Personen) ---------- */
+function seeded(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+const DEMO = [
+  ["Lea Müller", .95, 0], ["Jonas Becker", .9, 1], ["Amira Haddad", 1, 0], ["Tim Schröder", .5, 4],
+  ["Sophie Wagner", .8, 1], ["Can Yılmaz", .7, 2], ["Marie Hoffmann", .35, 6], ["Felix Neumann", 1, 0],
+  ["Nina Krause", .6, 3], ["David Okafor", .85, 1], ["Julia Fischer", .2, 8], ["Paul Richter", .75, 2],
+].map(([name, p, ago], i) => {
+  const r = seeded(i + 7);
+  const first = name.split(" ")[0].toLowerCase().replace("ı", "i");
+  const mail = `${first}.${name.split(" ")[1].toLowerCase().replace(/ö/g, "oe").replace(/ü/g, "ue").replace("ı", "i")}@example.de`;
+  const st = Object.assign(SB.blank(), { name, email: mail, os: r() < .7 ? "mac" : "win",
+    consent: { accepted: true, at: new Date(NOW - (ago + 5) * DAY).toISOString(), policyUrl: "https://school.digitale-leute.de/datenschutz" },
+    updatedAt: new Date(NOW - ago * DAY - r() * DAY / 2).toISOString() });
+  SB.TASKS.forEach(t => { if (r() < p + .1) st.tasks[t.id] = { done: true, email: t.id === "miro" && r() < .3 ? `${first}@gmail.com` : mail, ...(t.id === "google" ? { has: r() < .5 ? "gmail" : "other" } : {}) }; });
+  const hits = p >= 1 ? 4 : Math.min(4, Math.floor(r() * 5 * p));
+  SB.BOSS.hits.slice(0, hits).forEach(h => { st.boss[h.id] = h.id === "account" ? { done: true, user: first + "-" + (100 + i) } : { done: true }; });
+  return { ...SB.payload(st), _src: "demo" };
+});
+
+let rows = DEMO.slice();
+let sortKey = "percent", sortDir = -1;
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const shortName = n => { const [f, ...rest] = (n || "?").split(/\s+/); const l = rest.pop(); return l ? `${f} ${l[0]}.` : f; };
+function ago(iso) {
+  if (!iso) return ["–", false];
+  const d = (NOW - Date.parse(iso)) / DAY;
+  return [d < 1 ? "heute" : d < 2 ? "gestern" : `vor ${Math.floor(d)} Tagen`, d > 3];
+}
+
+function render() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const onlyOpen = document.getElementById("open").checked, onlyStale = document.getElementById("stale").checked;
+  let list = rows.filter(p => {
+    const hay = [p.participant.name, p.participant.defaultEmail, ...Object.values(p.tools).map(t => t.email), p.github.username].join(" ").toLowerCase();
+    return (!q || hay.includes(q)) && (!onlyOpen || p.progress.percent < 100) && (!onlyStale || ago(p.meta.updatedAt)[1]);
+  });
+  const val = p => sortKey === "name" ? (p.participant.name || "").toLowerCase() : sortKey === "updated" ? Date.parse(p.meta.updatedAt || 0) : p.progress.percent;
+  list.sort((a, b) => (val(a) > val(b) ? 1 : val(a) < val(b) ? -1 : 0) * sortDir);
+
+  // KPIs (über alle, nicht gefiltert)
+  const n = rows.length, avg = n ? Math.round(rows.reduce((s, p) => s + p.progress.percent, 0) / n) : 0;
+  const ready = rows.filter(p => p.progress.percent === 100).length;
+  const boss = rows.filter(p => !p.github.defeated).length;
+  const stale = rows.filter(p => ago(p.meta.updatedAt)[1] && p.progress.percent < 100).length;
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi"><strong>${n}</strong><span>Teilnehmende</span></div>
+    <div class="kpi petrol"><strong>${avg} %</strong><span>Kohorte im Schnitt startklar · ${ready} komplett</span></div>
+    <div class="kpi red"><strong>${boss}</strong><span>noch nicht durch den GitHub-Endboss</span></div>
+    <div class="kpi"><strong>${stale}</strong><span>seit über 3 Tagen inaktiv und nicht fertig</span></div>`;
+
+  const arr = k => sortKey === k ? `<span class="arr">${sortDir > 0 ? "▲" : "▼"}</span>` : "";
+  document.getElementById("thead").innerHTML = `<tr>
+    <th class="name sort" data-sort="name">Name${arr("name")}</th>
+    <th class="sort" data-sort="percent">Startklar${arr("percent")}</th>
+    ${SB.TASKS.map(t => `<th><img src="${ICON_CDN}${ICONS[t.id]}.svg" alt="">${t.name}</th>`).join("")}
+    <th><img src="${ICON_CDN}github.svg" alt="">GitHub</th>
+    <th>Punkte</th>
+    <th class="sort" data-sort="updated">Zuletzt${arr("updated")}</th></tr>`;
+
+  document.getElementById("tbody").innerHTML = list.map(p => {
+    const [when, isStale] = ago(p.meta.updatedAt);
+    const hits = Object.values(p.github.hits);
+    return `<tr>
+      <td class="name"><strong>${esc(p.participant.name)}${p._src !== "demo" ? `<span class="src">${esc(p._src)}</span>` : ""}</strong><small>${esc(p.participant.defaultEmail || "–")}</small></td>
+      <td><div class="prog"><div class="bar"><i style="width:${p.progress.percent}%"></i></div><b>${p.progress.percent}%</b></div></td>
+      ${SB.TASKS.map(t => { const x = p.tools[t.id]; return `<td>${x.done ? `<span class="ok" title="${esc(x.email || "")}${t.id === "google" && x.accountType ? " · " + esc(x.accountType) : ""}">✓</span>` : `<span class="no">·</span>`}</td>`; }).join("")}
+      <td title="${esc(p.github.username ? p.github.profileUrl : "noch kein Profil")}"><span class="pips${p.github.defeated ? " full" : ""}">${hits.map(h => `<i class="${h ? "on" : ""}"></i>`).join("")}</span></td>
+      <td class="pts">${p.progress.score}</td>
+      <td class="when${isStale && p.progress.percent < 100 ? " stale" : ""}">${when}</td></tr>`;
+  }).join("") || `<tr><td colspan="${SB.TASKS.length + 5}" class="sub">Keine Treffer.</td></tr>`;
+
+  const share = f => n ? Math.round(rows.filter(f).length / n * 100) + "%" : "–";
+  document.getElementById("tfoot").innerHTML = `<tr><td class="name">Erledigt</td><td></td>
+    ${SB.TASKS.map(t => `<td>${share(p => p.tools[t.id].done)}</td>`).join("")}
+    <td>${share(p => p.github.defeated)}</td><td></td><td></td></tr>`;
+
+  document.getElementById("lb").innerHTML = rows.slice().sort((a, b) => b.progress.score - a.progress.score || Date.parse(a.meta.updatedAt) - Date.parse(b.meta.updatedAt))
+    .slice(0, 5).map(p => `<li><span class="nm">${esc(shortName(p.participant.name))}</span><span class="pts">${p.progress.score} P</span></li>`).join("");
+
+  document.querySelectorAll("[data-sort]").forEach(th => th.onclick = () => {
+    const k = th.dataset.sort; sortDir = sortKey === k ? -sortDir : (k === "name" ? 1 : -1); sortKey = k; render();
+  });
+}
+
+/* CSV mit Schutz gegen Formel-Injection in Tabellenprogrammen */
+function cell(v) { v = String(v ?? ""); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return `"${v.replace(/"/g, '""')}"`; }
+document.getElementById("csv").onclick = () => {
+  const head = ["Name", "Startklar %", "Punkte", ...SB.TASKS.flatMap(t => [`${t.name} erledigt`, `${t.name} E-Mail`]), "GitHub-Benutzername", "GitHub-Profil", "GitHub Treffer", "Zuletzt aktiv"];
+  const lines = rows.map(p => [p.participant.name, p.progress.percent, p.progress.score,
+    ...SB.TASKS.flatMap(t => [p.tools[t.id].done ? "ja" : "nein", p.tools[t.id].email || ""]),
+    p.github.username || "", p.github.profileUrl || "", Object.values(p.github.hits).filter(Boolean).length, p.meta.updatedAt || ""].map(cell).join(";"));
+  const blob = new Blob(["﻿" + [head.map(cell).join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "speedyboarding-ergebnisse.csv"; a.click(); URL.revokeObjectURL(a.href);
+};
+
+function addPayload(p, src) {
+  if (!p || !p.participant || !p.tools || !p.github || !p.progress) throw new Error("Das sieht nicht nach einem SpeedyBoarding-Payload aus.");
+  rows = rows.filter(r => r._src === "demo" || r.participant.name !== p.participant.name);
+  rows.push({ ...p, _src: src });
+  render();
+}
+document.getElementById("mine").onclick = () => {
+  const st = SB.load();
+  if (!st.name && !st.email && !Object.keys(st.tasks).length) { alert("In diesem Browser gibt es noch keinen Spielstand. Spiel zuerst das SpeedyBoarding."); return; }
+  if (!st.name) st.name = "Du (ohne Namen)";
+  addPayload(SB.payload(st), "du");
+};
+document.getElementById("addjson").onclick = () => {
+  const m = document.getElementById("jsonmsg");
+  try { addPayload(JSON.parse(document.getElementById("json").value), "importiert"); m.textContent = "✓ Hinzugefügt"; }
+  catch (e) { m.textContent = e.message.startsWith("Das") ? e.message : "Kein gültiges JSON."; }
+};
+document.getElementById("reset").onclick = () => { rows = DEMO.slice(); render(); };
+["q", "open", "stale"].forEach(id => document.getElementById(id).addEventListener("input", render));
+render();
+</script>
+</body>
+</html>
