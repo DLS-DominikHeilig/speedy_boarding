@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://cdn.jsdelivr.net data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Vorschau Erfahrungslevel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Manrope, Arial, sans-serif; color: var(--text); line-height: 1.55;
+    background-color: var(--bg); background-image: radial-gradient(var(--dot) 1px, transparent 1px); background-size: 16px 16px; }
+  h1, h2 { margin: 0; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+  a { color: var(--petrol); }
+  .task { max-width: 980px; margin: 0 auto; padding: 28px 16px 70px; }
+  .proto { font: 700 12px/1.4 "JetBrains Mono", monospace; background: var(--yellow); display: inline-block; padding: 4px 10px; border-radius: 6px; }
+  .eyebrow { font: 700 12px/1.4 "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--petrol); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .panel { padding: 24px 26px; margin: 16px 0; }
+  .panel h2 { font-size: 1.2rem; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .panel h2.ask { margin-bottom: 18px; }
+  /* Pokertisch: DL-Grün als Filz */
+  .felt { background: var(--petrol); border-color: var(--petrol); }
+  .felt h2.ask { color: #fff; }
+  .felt.panel h2.ask span { color: rgba(255,255,255,.8); }
+  .felt .deck.picked .pcard:not([aria-pressed="true"]) { opacity: .7; }
+  .panel h2.ask span { color: var(--soft); font-weight: 400; font-size: .92rem; letter-spacing: normal; margin-left: 6px; }
+  .sub { color: var(--soft); font-size: .92rem; margin: 0 0 18px; }
+  .task-head { display: flex; gap: 18px; align-items: center; margin: 18px 0 22px; }
+  .app-ico { width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); display: grid; place-items: center; }
+  .app-ico img { width: 36px; height: 36px; }
+  .task-head h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); }
+  .title-row { display: flex; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; }
+  .why { font-size: 1.08rem; color: var(--muted); margin: 0; }
+  .steps { margin: 0; padding-left: 22px; }
+  .steps li { margin: 8px 0; }
+  .steps li::marker { font-weight: 800; color: var(--petrol); }
+  .note { border-radius: 10px; padding: 12px 16px; margin: 14px 0 0; font-size: .95rem; }
+  .note.info { background: #EEF4FF; }
+  .note.ok { background: #E8F5F2; }
+  .note.hot { background: #FFEDF0; box-shadow: inset 0 0 0 2px var(--red); }
+
+  /* Pixel-Pokerkarten */
+  .deck { display: grid; grid-template-columns: repeat(4, minmax(0, 170px)); gap: 16px; justify-content: center; }
+  .pcard { position: relative; aspect-ratio: 5 / 7; border: 3px solid var(--dark); border-radius: 4px; cursor: pointer;
+    background-color: #fff; background-image: radial-gradient(var(--dot) 1px, transparent 1px); background-size: 16px 16px; background-position: 6px 6px;
+    box-shadow: 4px 4px 0 var(--dark); font-family: inherit; color: var(--text); padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center;
+    transition: transform .12s steps(3), box-shadow .12s steps(3), background .15s; }
+  .pcard:hover { transform: translate(-2px, -4px); box-shadow: 6px 8px 0 var(--dark); }
+  .pcard:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .pcard .idx { position: absolute; font: 700 18px/1 "JetBrains Mono", monospace; }
+  .pcard .idx.tl { top: 8px; left: 9px; }
+  .pcard .idx.br { bottom: 8px; right: 9px; transform: rotate(180deg); }
+  .pcard .lbl { font-weight: 800; font-size: .88rem; line-height: 1.2; padding: 0 10px; letter-spacing: -0.01em; }
+  .pips { display: flex; gap: 3px; }
+  .pips i { width: 10px; height: 10px; border: 2px solid var(--dark); }
+  .pips i.on { background: var(--dark); }
+  .pcard[aria-pressed="true"] { transform: translate(-2px, -6px); box-shadow: 6px 10px 0 var(--dark); }
+  .deck.picked .pcard:not([aria-pressed="true"]) { opacity: .55; }
+  .deck.picked .pcard:not([aria-pressed="true"]):hover { opacity: 1; }
+  .pcard.flip { animation: flip .45s steps(6); }
+  @keyframes flip { 0% { transform: rotateY(0) } 50% { transform: rotateY(90deg) } 100% { transform: rotateY(0) translate(-2px,-6px) } }
+
+  /* Schritte, ein- und ausklappbar */
+  details.howto > summary { cursor: pointer; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.02em; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  details.howto > summary::-webkit-details-marker { display: none; }
+  details.howto > summary::after { content: "▸"; font-family: "JetBrains Mono", monospace; color: var(--petrol); transition: transform .15s; }
+  details.howto[open] > summary::after { transform: rotate(90deg); }
+  details.howto[open] > summary { margin-bottom: 12px; }
+  .speed { font: 700 11px/1 "JetBrains Mono", monospace; background: var(--teal); padding: 4px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+
+  /* Deine Angabe */
+  .field { display: grid; gap: 6px; margin: 0 0 6px; }
+  .field label { font-weight: 700; font-size: .95rem; }
+  input[type=email] { font: inherit; padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px; background: #fff; color: var(--text); width: 100%; }
+  input:focus { outline: none; border-color: var(--petrol); }
+  .check { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 0; font-weight: 600; cursor: pointer; }
+  .check input { width: 22px; height: 22px; accent-color: var(--petrol); margin: 1px 0 0; flex: none; }
+  .task-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+  .done-banner { font-weight: 700; color: var(--petrol); }
+  .btn { border: 0; cursor: pointer; border-radius: 10px; padding: 14px 22px; font: 700 1rem Manrope, Arial, sans-serif; }
+  .btn-primary { background: var(--teal); color: var(--dark); box-shadow: 0 4px 0 #00b9a6; }
+  .btn-primary:disabled { background: var(--line); color: var(--soft); box-shadow: none; cursor: not-allowed; }
+  /* So geht's + Deine Angabe nebeneinander in einem Block */
+  .combo { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
+  .combo .col { padding: 24px 26px; min-width: 0; }
+  .combo .angabe { border-left: 1px solid var(--line); background: #FCFCFC; border-radius: 0 var(--radius) var(--radius) 0; }
+  .combo .angabe .sub { margin-bottom: 14px; }
+  .combo .task-actions { margin-top: 18px; }
+  .combo.speedrun { grid-template-columns: 1fr; }
+  .combo.speedrun .col:first-child { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .combo.speedrun .angabe { border-left: 0; border-radius: 0 0 var(--radius) var(--radius); }
+  @media (max-width: 760px) {
+    .combo { grid-template-columns: 1fr; }
+    .combo .angabe { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); }
+    .combo .col { padding: 20px 18px; }
+  }
+
+  /* Team-Ansicht-Ausschnitt */
+  .team table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .team th, .team td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  .team th { font: 700 11px/1.3 "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--soft); }
+  .bar { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 8px; }
+  .bar i { width: 10px; height: 10px; background: var(--line); }
+  .bar i.on { background: var(--red); }
+  .dist { display: flex; height: 14px; border-radius: 3px; overflow: hidden; min-width: 140px; }
+  .dist span { display: block; }
+
+  @media (max-width: 620px) {
+    .deck { grid-template-columns: repeat(2, 1fr); }
+    .panel { padding: 20px 18px; }
+    .team .hide-m { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="task">
+  <span class="proto">🧪 Vorschau · Erfahrungslevel (noch nicht im Spiel)</span>
+
+  <div class="task-head">
+    <div class="app-ico"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/figma.svg" alt=""></div>
+    <div><span class="eyebrow"><span class="emo">📋</span>Aufgabe · +50 Punkte</span><div class="title-row"><h1>Figma</h1><p class="why">Figma ist eine Design-Software.</p></div></div>
+  </div>
+
+  <section class="card panel felt">
+    <h2 class="ask">Wie gut kennst du Figma? <span>Zieh eine Karte.</span></h2>
+    <div class="deck" id="deck" role="group" aria-label="Erfahrungslevel Figma"></div>
+  </section>
+
+  <section class="card panel combo" id="combo">
+    <div class="col">
+      <details class="howto" id="howto" open>
+        <summary><span>So geht's<span class="speed" id="speed" hidden>⚡ SPEEDRUN</span></span></summary>
+        <ol class="steps">
+          <li>Auf <a href="https://www.figma.com/signup" target="_blank" rel="noopener">figma.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.</li>
+          <li>Die E-Mail-Adresse deines Figma-Accounts bei „Deine Angabe“ eintragen.</li>
+          <li>Optional: die <a href="https://www.figma.com/downloads/" target="_blank" rel="noopener">Figma-Desktop-App</a> installieren. Im Browser geht's aber auch.</li>
+        </ol>
+        <div class="note info" id="video"><span class="emo">📺</span>Neu bei Figma? <a href="https://www.youtube.com/watch?v=zzhSFobLkYw&amp;list=PLXDU_eVOJTx5IuSrbtanZHnDuPB3Hx0hq" target="_blank" rel="noopener">Figma für Beginner (Playlist)</a> (Deutsch).</div>
+      </details>
+    </div>
+    <div class="col angabe" id="angabe">
+      <h2>Deine Angabe</h2>
+      <p class="sub">Brauchen wir von allen, auch von Profis: Damit nehmen wir dich in unseren Figma-Team-Plan auf.</p>
+      <div class="field">
+        <label for="tmail">E-Mail-Adresse deines Figma-Accounts</label>
+        <input id="tmail" type="email" autocomplete="email" placeholder="name@beispiel.de">
+      </div>
+      <label class="check"><input type="checkbox" id="tconfirm"> Ich habe einen Figma-Account bzw. nutze diese Adresse für Figma.</label>
+      <div class="task-actions">
+        <span id="tstatus"></span>
+        <button class="btn btn-primary" id="tdone" type="button" disabled>Erledigt · +50</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card panel team">
+    <h2><span class="emo">📊</span>So sieht's das PM-Team</h2>
+    <p class="sub">Ausschnitt aus der Team-Ansicht, Demo-Daten. Deine Karte zählt live mit.</p>
+    <table>
+      <thead><tr><th>App</th><th>Ø Level</th><th class="hide-m">Verteilung 0 · 1 · 2 · 3</th></tr></thead>
+      <tbody id="team"></tbody>
+    </table>
+  </section>
+</main>
+<script src="preview-level.js"></script>
+</body>
+</html>
