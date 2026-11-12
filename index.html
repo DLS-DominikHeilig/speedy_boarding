@@ -55,6 +55,7 @@
   .hud { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
   .hud .wrap { display: flex; align-items: center; gap: 16px; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
   .logo { font-weight: 800; letter-spacing: -0.03em; font-size: 1.05rem; text-decoration: none; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .logo i { font-style: italic; font-synthesis: style; letter-spacing: -0.02em; padding-right: .1em; }
   .logo b { background: var(--dark); color: #fff; border-radius: 6px; padding: 1px 6px; font-size: .8rem; }
   .hud-bar { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 10px; }
   .bar { flex: 1; height: 12px; background: var(--line); border-radius: 3px; overflow: hidden; display: flex; }
@@ -218,6 +219,7 @@
 <div id="app"></div>
 <div class="toast" id="toast" aria-live="polite"></div>
 
+<script src="schema.js"></script>
 <script>
 /* =========================================================
    SpeedyBoarding – Konfiguration
@@ -227,14 +229,14 @@ const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/";
 
 const TASKS = [
   {
-    id: "google", name: "Google", icon: "google", points: 50, color: "var(--blue)",
+    id: "google", name: "Google", icon: "google", color: "var(--blue)",
     teaser: "Classroom, Kalender, Docs & Forms",
     why: "Wir organisieren das Bootcamp in Google: Kurse in Classroom, Termine im Kalender, Unterlagen in Docs. Dafür brauchst du ein Google-Konto – <strong>Gmail ist aber nicht nötig.</strong>",
     google: true,
     emailLabel: "E-Mail-Adresse deines Google-Kontos",
   },
   {
-    id: "slack", name: "Slack", icon: "slack", points: 50, color: "var(--yellow)",
+    id: "slack", name: "Slack", icon: "slack", color: "var(--yellow)",
     teaser: "Unser Chat für alles",
     why: "In Slack läuft die Kommunikation im Bootcamp: Ankündigungen, Fragen, Austausch mit deiner Kohorte.",
     steps: [
@@ -244,7 +246,7 @@ const TASKS = [
     ],
   },
   {
-    id: "miro", name: "Miro", icon: "miro", points: 50, color: "var(--yellow)",
+    id: "miro", name: "Miro", icon: "miro", color: "var(--yellow)",
     teaser: "Whiteboard für Workshops",
     why: "Auf Miro-Boards arbeiten wir gemeinsam in Workshops: Brainstorming, User Journeys, Priorisierung.",
     steps: [
@@ -253,7 +255,7 @@ const TASKS = [
     ],
   },
   {
-    id: "figma", name: "Figma", icon: "figma", points: 50, color: "var(--red)",
+    id: "figma", name: "Figma", icon: "figma", color: "var(--red)",
     teaser: "Designs & Prototypen",
     why: "In Figma schaust du dir Designs an, kommentierst sie und baust eigene Klick-Prototypen.",
     steps: [
@@ -263,7 +265,7 @@ const TASKS = [
     ],
   },
   {
-    id: "jira", name: "Jira", icon: "jira", points: 50, color: "var(--blue)",
+    id: "jira", name: "Jira", icon: "jira", color: "var(--blue)",
     teaser: "Backlog & Tickets",
     why: "In Jira lernst du, wie Produktteams Backlogs, Stories und Sprints organisieren.",
     steps: [
@@ -272,7 +274,7 @@ const TASKS = [
     ],
   },
   {
-    id: "claude", name: "Claude", icon: "claude", points: 50, color: "var(--petrol)",
+    id: "claude", name: "Claude", icon: "claude", color: "var(--petrol)",
     teaser: "Dein KI-Teamkollege",
     why: "Mit Claude schreibst, recherchierst und baust du – und Claude hilft dir auch, wenn beim Setup mal etwas hakt.",
     steps: [
@@ -282,7 +284,7 @@ const TASKS = [
     ],
   },
   {
-    id: "chatgpt", name: "ChatGPT", icon: "openai", points: 50, color: "var(--petrol)",
+    id: "chatgpt", name: "ChatGPT", icon: "openai", color: "var(--petrol)",
     teaser: "Zweite KI-Perspektive",
     why: "Im Bootcamp vergleichen wir verschiedene KI-Tools. ChatGPT gehört dazu.",
     steps: [
@@ -292,25 +294,12 @@ const TASKS = [
   },
 ];
 
-const BOSS = {
-  id: "github", name: "GitHub", icon: "github", points: 100,
-  hits: [
-    { id: "account", title: "GitHub-Account & Profil-Link", points: 25 },
-    { id: "git", title: "Git installieren", points: 25 },
-    { id: "token", title: "Token erstellen", points: 25 },
-    { id: "push", title: "Erster Push", points: 25 },
-  ],
-};
+const BOSS = SB.BOSS;
 
-const RANKS = [
-  [0, "Neu im Spiel"],
-  [25, "Setup-Entdecker:in"],
-  [50, "PM in Ausbildung"],
-  [75, "Fast AI-Powered"],
-  [100, "AI-Powered PM"],
-];
 
-const MAX = TASKS.reduce((s, t) => s + t.points, 0) + BOSS.points;
+// Punkte kommen aus schema.js (einzige Quelle)
+TASKS.forEach(t => { t.points = SB.TASKS.find(x => x.id === t.id).points; });
+const MAX = SB.MAX;
 
 /* ---------- Pixel-Sprites (eigene Figuren) ---------- */
 const PAL = { k: "#222222", w: "#FFFFFF", s: "#F2C6A0", h: "#5A3A22", t: "#02F3DA", p: "#1B7A6A", y: "#F5C451", r: "#F2284B", d: "#B5122F", b: "#6B9EF7", g: "#9A9A9A", l: "#DADADA" };
@@ -412,11 +401,9 @@ function appIcon(t) {
 }
 
 /* ---------- Zustand ---------- */
-const KEY = "speedyboarding-v2";
-const blank = () => ({ name: "", email: "", tasks: {}, boss: {}, last: null, os: /Win/i.test(navigator.platform) ? "win" : "mac" });
-let state = blank();
-try { state = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch {}
-function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+let state = SB.load();
+const blank = SB.blank;
+function save() { SB.save(state); }
 
 // Magic Link: ?name=Lea%20Müller&email=lea@example.de
 (() => {
@@ -427,18 +414,18 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catc
 })();
 
 const firstName = () => (state.name || "").split(/\s+/)[0] || "Du";
-const taskDone = id => !!(state.tasks[id] && state.tasks[id].done);
-const bossHits = () => BOSS.hits.filter(h => state.boss[h.id] && state.boss[h.id].done);
-const score = () => TASKS.filter(t => taskDone(t.id)).reduce((s, t) => s + t.points, 0) + bossHits().reduce((s, h) => s + h.points, 0);
-const pct = () => Math.round(score() / MAX * 100);
-const rank = () => RANKS.filter(([p]) => pct() >= p).pop()[1];
+const taskDone = id => SB.taskDone(state, id);
+const bossHits = () => BOSS.hits.filter(h => SB.hitDone(state, h.id));
+const score = () => SB.score(state);
+const pct = () => SB.percent(state);
+const rank = () => SB.rank(state);
 const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
 /* ---------- Bausteine ---------- */
 function hud() {
   return `<header class="hud"><div class="wrap">
-    <a class="logo" href="#map"><b>DL</b> SpeedyBoarding</a>
+    <a class="logo" href="#map"><b>DL</b> <i>SpeedyBoarding</i></a>
     <div class="hud-bar"><div class="bar" aria-hidden="true"><i style="width:${pct()}%"></i></div>
       <span class="score">${score()} <em>/ ${MAX} Punkte</em></span></div>
   </div></header>`;
@@ -531,7 +518,6 @@ function viewMap() {
           <div class="hp"><span class="mono" style="font-size:12px;font-weight:700">HP</span><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span class="mono" style="font-size:12px">${hits}/4 Treffer</span></div>
         </div>
         <div class="pts-col"><span class="pts">+${BOSS.points}</span></div>
-        ${bossDone ? "" : cursor("End Boss 49")}
       </button>
     </div>
     <div class="map-foot">
@@ -619,7 +605,7 @@ function viewBoss() {
         <p>Hier kommt dein Code ins Netz. Vier Treffer, und der Boss liegt am Boden.</p>
         <div class="hp"><span class="mono" style="font-size:12px;font-weight:700">HP</span><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span class="mono" style="font-size:12px">${hits}/4</span></div>
       </div>
-      <div class="boss-sprite" id="bossSprite" style="position:relative">${sprite(hits === 4 ? "bossDown" : "boss")}${hits === 4 ? "" : `<span style="position:absolute;left:62%;top:58%">${cursor("End Boss 49")}</span>`}</div>
+      <div class="boss-sprite" id="bossSprite" style="position:relative">${sprite(hits === 4 ? "bossDown" : "boss")}</div>
     </div>
     <div class="calm">
       <strong>Fehler passieren hier – alles easy.<span class="emo emo-after">🙌</span></strong>
