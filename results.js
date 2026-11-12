@@ -26,6 +26,8 @@ const DEMO = [
   });
   const hits = p >= 1 ? 4 : Math.min(4, Math.floor(r() * 5 * p));
   SB.BOSS.hits.slice(0, hits).forEach(h => { st.boss[h.id] = h.id === "account" ? { done: true, user: first + "-" + (100 + i) } : { done: true }; });
+  const BASE = { google: 2.2, slack: 2, miro: 1.5, figma: 1.2, jira: .8, claude: 1.6, chatgpt: 2.3, github: .6 };
+  SB.LEVEL_TOOLS.forEach(id => { if (r() < .85) st.levels[id] = Math.max(0, Math.min(3, Math.round(BASE[id] + (r() - .5) * 2.4))); });
   return { ...SB.payload(st), _src: "demo" };
 });
 
@@ -71,18 +73,23 @@ function render() {
   const appStats = stats.filter(x => x.id !== "github");
   const minApp = Math.min(...appStats.map(x => x.pct));
   const weak = new Set(n && minApp < 100 ? appStats.filter(x => x.pct === minApp && !worst.has(x.id)).map(x => x.id) : []);
+  // Ø Erfahrungslevel pro App (nur wer eine Karte gezogen hat)
+  const levelOf = (p, id) => id === "github" ? p.github.level : p.tools[id] && p.tools[id].level;
+  const avgLevel = id => { const v = rows.map(p => levelOf(p, id)).filter(SB.validLevel); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const lvlBar = a => a === null ? `<span class="lv-none">–</span>` : `<span class="lv" title="Ø Erfahrungslevel ${a.toFixed(1).replace(".", ",")} von 3"><span class="lv-pips">${[1, 2, 3].map(i => `<i class="${i <= Math.round(a) ? "on" : ""}"></i>`).join("")}</span>${a.toFixed(1).replace(".", ",")}</span>`;
   const lvl = v => v < 50 ? "low" : v < 80 ? "mid" : "high";
   const S = Object.fromEntries(stats.map(x => [x.id, x]));
   const thApp = (id, label) => `<th class="${worst.has(id) ? "worst" : weak.has(id) ? "weak" : ""}">${icon(id)}${label}<span class="pct ${lvl(S[id].pct)}">${S[id].pct}%</span>${worst.has(id) ? `<span class="worst-tag"><span class="emo">😬</span>am wenigsten</span>` : weak.has(id) ? `<span class="worst-tag weak-tag"><span class="emo">⚠️</span>schwächste Aufgabe</span>` : ""}</th>`;
   const wc = id => worst.has(id) ? " worst" : weak.has(id) ? " weak" : "";
 
   document.getElementById("rank").innerHTML = `<h2><span class="emo">🧭</span>Wo hakt's?</h2>
-    <p class="sub">Erledigt-Quote pro App, die schwächste zuerst. Hier wird die Kohorte am meisten Hilfe brauchen.</p>
+    <p class="sub">Erledigt-Quote pro App, die schwächste zuerst. Rechts das Ø Erfahrungslevel (0 = nie benutzt, 3 = check ich). Hier wird die Kohorte am meisten Hilfe brauchen.</p>
     <div class="rank">${stats.slice().sort((a, b) => a.pct - b.pct || a.name.localeCompare(b.name)).map(x => `
       <div class="rank-row${worst.has(x.id) ? " worst" : weak.has(x.id) ? " weak" : ""}">
         <span class="rank-name">${icon(x.id)}${x.name}</span>
         <span class="rank-bar"><i class="${lvl(x.pct)}" style="width:${Math.max(x.pct, 2)}%"></i></span>
         <span class="rank-val">${x.pct}%</span><span class="rank-n">${x.count}/${n}</span>
+        <span class="rank-lv">${SB.LEVEL_TOOLS.includes(x.id) ? lvlBar(avgLevel(x.id)) : ""}</span>
         <span class="rank-tag">${worst.has(x.id) ? `<span class="emo">😬</span>Seelisch-moralisch vorbereiten` : weak.has(x.id) ? `<span class="emo">⚠️</span>Schwächste Aufgabe` : ""}</span>
       </div>`).join("")}</div>`;
 
@@ -108,7 +115,9 @@ function render() {
   }).join("") || `<tr><td colspan="${SB.TASKS.length + 5}" class="sub">Keine Treffer.</td></tr>`;
 
   document.getElementById("tfoot").innerHTML = `<tr><td class="name">Erledigt</td><td></td>
-    ${[...SB.TASKS.map(t => t.id), "github"].map(id => `<td class="${wc(id)}">${S[id].count}/${n}</td>`).join("")}<td></td><td></td></tr>`;
+    ${[...SB.TASKS.map(t => t.id), "github"].map(id => `<td class="${wc(id)}">${S[id].count}/${n}</td>`).join("")}<td></td><td></td></tr>
+    <tr class="lv-row"><td class="name">Ø Level</td><td></td>
+    ${[...SB.TASKS.map(t => t.id), "github"].map(id => `<td class="${wc(id)}">${SB.LEVEL_TOOLS.includes(id) ? lvlBar(avgLevel(id)) : ""}</td>`).join("")}<td></td><td></td></tr>`;
 
   const lbRows = rows.filter(p => p.leaderboard && p.leaderboard.optIn && p.leaderboard.gamerName);
   document.getElementById("lbInfo").textContent = `${lbRows.length} von ${n} haben zugestimmt.`;
@@ -123,10 +132,10 @@ function render() {
 /* CSV mit Schutz gegen Formel-Injection in Tabellenprogrammen */
 function cell(v) { v = String(v ?? ""); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return `"${v.replace(/"/g, '""')}"`; }
 document.getElementById("csv").onclick = () => {
-  const head = ["Name", "Startklar %", "Punkte", ...SB.TASKS.flatMap(t => t.noEmail ? [`${t.name} erledigt`] : [`${t.name} erledigt`, `${t.name} E-Mail`]), "GitHub-Benutzername", "GitHub-Profil", "GitHub Treffer", "Zuletzt aktiv"];
+  const head = ["Name", "Startklar %", "Punkte", ...SB.TASKS.flatMap(t => t.noEmail ? [`${t.name} erledigt`] : [`${t.name} erledigt`, `${t.name} E-Mail`, `${t.name} Level`]), "GitHub-Benutzername", "GitHub-Profil", "GitHub Treffer", "GitHub Level", "Zuletzt aktiv"];
   const lines = rows.map(p => [p.participant.name, p.progress.percent, p.progress.score,
-    ...SB.TASKS.flatMap(t => t.noEmail ? [p.tools[t.id].done ? "ja" : "nein"] : [p.tools[t.id].done ? "ja" : "nein", p.tools[t.id].email || ""]),
-    p.github.username || "", p.github.profileUrl || "", Object.values(p.github.hits).filter(Boolean).length, p.meta.updatedAt || ""].map(cell).join(";"));
+    ...SB.TASKS.flatMap(t => t.noEmail ? [p.tools[t.id].done ? "ja" : "nein"] : [p.tools[t.id].done ? "ja" : "nein", p.tools[t.id].email || "", p.tools[t.id].level ?? ""]),
+    p.github.username || "", p.github.profileUrl || "", Object.values(p.github.hits).filter(Boolean).length, p.github.level ?? "", p.meta.updatedAt || ""].map(cell).join(";"));
   const blob = new Blob(["﻿" + [head.map(cell).join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "speedyboarding-ergebnisse.csv"; a.click(); URL.revokeObjectURL(a.href);
 };
@@ -146,6 +155,7 @@ function normalizePayload(p) {
     consent: isObj(p.consent) && p.consent.privacyNoticeAccepted === true ? { accepted: true, at: p.consent.acceptedAt, policyUrl: p.consent.policyUrl } : null,
     leaderboard: { optIn: lb.optIn === true, gamerName: lb.gamerName, at: lb.optedInAt },
     tasks: Object.fromEntries(SB.TASKS.map(t => { const x = isObj(p.tools[t.id]) ? p.tools[t.id] : {}; return [t.id, { done: x.done === true, email: x.email, has: x.accountType }]; })),
+    levels: Object.fromEntries(SB.LEVEL_TOOLS.map(id => [id, id === "github" ? gh.level : isObj(p.tools[id]) ? p.tools[id].level : null])),
     boss: Object.fromEntries(SB.BOSS.hits.map(h => [h.id, { done: hits[h.id] === true, ...(h.id === "account" && user ? { user } : {}) }])),
   };
   return SB.payload(SB.sanitize(raw));

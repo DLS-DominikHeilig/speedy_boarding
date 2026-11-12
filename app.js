@@ -27,6 +27,8 @@ const TASKS = [
   {
     id: "google", name: "Google", icon: "google", color: "var(--blue)",
     teaser: "Classroom, Kalender, Docs & Forms",
+    tagline: "Google ist unser Kurs-Zuhause.",
+    invite: "Damit laden wir dich in Classroom und den Kurs-Kalender ein.",
     why: "Wir organisieren das Bootcamp in Google: Kurse in Classroom, Termine im Kalender, Unterlagen in Docs. Dafür brauchst du ein Google-Konto – <strong>Gmail ist aber nicht nötig.</strong>",
     google: true,
     emailLabel: "E-Mail-Adresse deines Google-Kontos",
@@ -34,10 +36,12 @@ const TASKS = [
   {
     id: "slack", name: "Slack", icon: "slack", color: "var(--yellow)",
     teaser: "Unser Chat für alles",
+    tagline: "Slack ist unser Chat.",
+    invite: "Damit laden wir dich in unseren Bootcamp-Slack ein.",
     video: { url: "https://www.youtube.com/watch?v=0DA2PUpKRec", label: "Slack als Kommunikationstool", lang: "Deutsch" },
     why: "In Slack läuft die Kommunikation im Bootcamp: Ankündigungen, Fragen, Austausch mit deiner Kohorte.",
     steps: [
-      "Gib unten die E-Mail-Adresse an, mit der du Slack nutzen willst. Hast du schon einen Slack-Account, nimm dessen Adresse.",
+      "Gib bei „Deine Angabe“ die E-Mail-Adresse an, mit der du Slack nutzen willst. Hast du schon einen Slack-Account, nimm dessen Adresse.",
       "Du bekommst von uns eine <strong>Einladung</strong> an diese Adresse. Link öffnen und beitreten.",
       "Empfohlen: die <a href=\"https://slack.com/downloads\" target=\"_blank\" rel=\"noopener\">Slack-App</a> für deinen Rechner installieren.",
     ],
@@ -45,50 +49,58 @@ const TASKS = [
   {
     id: "miro", name: "Miro", icon: "miro", color: "var(--yellow)",
     teaser: "Whiteboard für Workshops",
+    tagline: "Miro ist ein Online-Whiteboard.",
+    invite: "Damit laden wir dich zu den Kurs-Boards ein.",
     video: { url: "https://www.youtube.com/watch?v=7L1-0DOGHDY", label: "Einführung in Miro", lang: "Englisch" },
     why: "Auf Miro-Boards arbeiten wir gemeinsam in Workshops: Brainstorming, User Journeys, Priorisierung.",
     steps: [
       "Auf <a href=\"https://miro.com/signup/\" target=\"_blank\" rel=\"noopener\">miro.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.",
-      "Die E-Mail-Adresse deines Miro-Accounts unten eintragen. An diese Adresse laden wir dich zu den Kurs-Boards ein.",
+      "Die E-Mail-Adresse deines Miro-Accounts bei „Deine Angabe“ eintragen. An diese Adresse laden wir dich zu den Kurs-Boards ein.",
     ],
   },
   {
     id: "figma", name: "Figma", icon: "figma", color: "var(--red)",
     teaser: "Designs & Prototypen",
+    tagline: "Figma ist eine Design-Software.",
+    invite: "Damit nehmen wir dich in unseren Figma-Team-Plan auf.",
     video: { url: "https://www.youtube.com/watch?v=zzhSFobLkYw&list=PLXDU_eVOJTx5IuSrbtanZHnDuPB3Hx0hq", label: "Figma für Beginner (Playlist)", lang: "Deutsch" },
     why: "In Figma schaust du dir Designs an, kommentierst sie und baust eigene Klick-Prototypen.",
     steps: [
       "Auf <a href=\"https://www.figma.com/signup\" target=\"_blank\" rel=\"noopener\">figma.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.",
-      "Die E-Mail-Adresse deines Figma-Accounts unten eintragen.",
+      "Die E-Mail-Adresse deines Figma-Accounts bei „Deine Angabe“ eintragen.",
       "Optional: die <a href=\"https://www.figma.com/downloads/\" target=\"_blank\" rel=\"noopener\">Figma-Desktop-App</a> installieren. Im Browser geht's aber auch.",
     ],
   },
   {
     id: "jira", name: "Jira", icon: "jira", color: "var(--blue)",
     teaser: "Backlog & Tickets",
+    tagline: "Jira ist ein Tool für Backlogs und Tickets.",
+    invite: "Damit laden wir dich in unser Jira ein.",
     why: "In Jira lernst du, wie Produktteams Backlogs, Stories und Sprints organisieren.",
     steps: [
-      "Gib unten die E-Mail-Adresse an, mit der du Jira nutzen willst. Hast du schon einen Atlassian-Account, nimm dessen Adresse.",
+      "Gib bei „Deine Angabe“ die E-Mail-Adresse an, mit der du Jira nutzen willst. Hast du schon einen Atlassian-Account, nimm dessen Adresse.",
       "Du bekommst von uns eine <strong>Einladung</strong>. Beim Annehmen legst du einen Atlassian-Account an, falls du noch keinen hast.",
     ],
   },
   {
     id: "claude", name: "Claude", icon: "claude", color: "var(--petrol)",
     teaser: "Dein KI-Teamkollege",
+    tagline: "Claude ist ein KI-Assistent.",
     why: "Mit Claude schreibst, recherchierst und baust du – und Claude hilft dir auch, wenn beim Setup mal etwas hakt.",
     steps: [
       "Auf <a href=\"https://claude.ai\" target=\"_blank\" rel=\"noopener\">claude.ai</a> einen Account anlegen – oder deinen bestehenden nutzen.",
       "Die <a href=\"https://claude.ai/download\" target=\"_blank\" rel=\"noopener\">Claude-App</a> für deinen Rechner installieren und anmelden.",
-      "Die E-Mail-Adresse deines Claude-Accounts unten eintragen.",
+      "Die E-Mail-Adresse deines Claude-Accounts bei „Deine Angabe“ eintragen.",
     ],
   },
   {
     id: "chatgpt", name: "ChatGPT", icon: "openai", color: "var(--petrol)",
     teaser: "Zweite KI-Perspektive",
+    tagline: "ChatGPT ist ein KI-Assistent.",
     why: "Im Bootcamp vergleichen wir verschiedene KI-Tools. ChatGPT gehört dazu.",
     steps: [
       "Auf <a href=\"https://chatgpt.com\" target=\"_blank\" rel=\"noopener\">chatgpt.com</a> einen Account anlegen – oder deinen bestehenden nutzen.",
-      "Die E-Mail-Adresse deines ChatGPT-Accounts unten eintragen.",
+      "Die E-Mail-Adresse deines ChatGPT-Accounts bei „Deine Angabe“ eintragen.",
     ],
   },
 ];
@@ -510,8 +522,8 @@ function viewTask(id) {
     ${customDone(t)}
   </div></main>`;
   const g = (state.tasks.google && state.tasks.google.has) || "";
-  const body = t.google ? `
-    <div class="card panel">
+  const lv = state.levels[t.id], fast = lv >= 2;
+  const left = t.google ? `
       <h2>Hast du schon ein Google-Konto?</h2>
       <div class="choices" id="gchoice">
         <label><input type="radio" name="g" value="gmail" ${g === "gmail" ? "checked" : ""}> Ja, mit einer Gmail-Adresse</label>
@@ -526,28 +538,45 @@ function viewTask(id) {
         </ol>
         <div class="note info"><span class="emo">💡</span>Lieber ein Gmail-Postfach? Geht natürlich auch – dann einfach eine neue Gmail-Adresse wählen.</div>
       </div>
-      <div class="note warn"><span class="emo">⚠️</span>Bitte <strong>keine Arbeits-Adresse</strong> deines aktuellen Arbeitgebers. Die kann Kurse blockieren, und bei einem Jobwechsel ist der Zugang weg.</div>
-    </div>` : `
-    <div class="card panel">
-      <h2>So geht's</h2>
-      <ol class="steps">${t.steps.map(s => `<li>${s}</li>`).join("")}</ol>
-      ${t.video ? `<div class="note info"><span class="emo">📺</span>Neu bei ${esc(t.name)}? <a href="${t.video.url}" target="_blank" rel="noopener">${esc(t.video.label)}</a> (${t.video.lang}). Kennst du ${esc(t.name)} schon, kannst du das überspringen.</div>` : ""}
-    </div>`;
-  return `${hud()}<main class="wrap"><div class="task">
+      <div class="note warn"><span class="emo">⚠️</span>Bitte <strong>keine Arbeits-Adresse</strong> deines aktuellen Arbeitgebers. Die kann Kurse blockieren, und bei einem Jobwechsel ist der Zugang weg.</div>` : `
+      <details class="howto" id="howto"${fast ? "" : " open"}>
+        <summary><span>So geht's<span class="show-btn">Anleitung zeigen</span></span></summary>
+        <ol class="steps">${t.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+        ${t.video ? `<div class="note ${lv === 0 ? "hot" : "info"}" id="video"><span class="emo">📺</span>Neu bei ${esc(t.name)}? <a href="${t.video.url}" target="_blank" rel="noopener">${esc(t.video.label)}</a> (${t.video.lang}).</div>` : ""}
+      </details>`;
+  return `${hud()}<main class="wrap"><div class="task task-wide">
     ${navRow(t.id)}
-    <div class="task-head">${appIcon(t)}<div><span class="eyebrow"><span class="emo">📋</span>Aufgabe · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
-    <p style="font-size:1.08rem;color:var(--muted);margin:0">${t.why}</p>
-    ${body}
-    <div class="card panel">
-      <h2>Deine Angabe</h2>
-      ${emailField(t)}
-      <label class="check"><input type="checkbox" id="tconfirm" ${done ? "checked" : ""}> ${t.google ? "Ich habe ein Google-Konto mit dieser Adresse." : `Ich habe einen ${esc(t.name)}-Account bzw. nutze diese Adresse für ${esc(t.name)}.`}</label>
-      <div class="task-actions">
-        ${done ? `<span class="done-banner">✓ Erledigt · +${t.points} Punkte</span>` : "<span></span>"}
-        <button class="btn btn-primary" id="tdone" type="button">${done ? "Speichern & zur Map" : `Erledigt · +${t.points}`}</button>
+    <div class="task-head">${appIcon(t)}<div><span class="eyebrow"><span class="emo">📋</span>Aufgabe · +${t.points} Punkte</span><div class="title-row"><h1>${t.name}</h1><p class="tagline">${t.tagline || ""}</p></div></div></div>
+    ${levelDeck(t.id, t.name)}
+    <section class="card panel combo${fast && !t.google ? " collapsed" : ""}" id="combo">
+      <div class="col">${left}</div>
+      <div class="col angabe">
+        <h2>Deine Angabe</h2>
+        <p class="sub">Brauchen wir von allen, auch von Profis: ${t.invite || "Damit wissen wir, mit welchem Account du im Bootcamp arbeitest."}</p>
+        ${emailField(t)}
+        <label class="check"><input type="checkbox" id="tconfirm" ${done ? "checked" : ""}> ${t.google ? "Ich habe ein Google-Konto mit dieser Adresse." : `Ich habe einen ${esc(t.name)}-Account bzw. nutze diese Adresse für ${esc(t.name)}.`}</label>
+        <div class="task-actions">
+          ${done ? `<span class="done-banner">✓ Erledigt · +${t.points} Punkte</span>` : "<span></span>"}
+          <button class="btn btn-primary" id="tdone" type="button">${done ? "Speichern & zur Map" : `Weiter · +${t.points}`}</button>
+        </div>
       </div>
-    </div>
+    </section>
   </div></main>`;
+}
+
+/* Erfahrungslevel: Pixel-Pokerkarten auf grünem Filz (Selbsteinschätzung, keine Punkte) */
+function levelDeck(id, name) {
+  const cur = state.levels[id];
+  return `<section class="card panel felt">
+    <h2 class="ask">Wie gut kennst du ${esc(name)}? <span>Zieh eine Karte.</span></h2>
+    <div class="deck${SB.validLevel(cur) ? " picked" : ""}" role="group" aria-label="Erfahrungslevel ${esc(name)}" data-level-for="${id}">
+      ${SB.LEVELS.map(l => `<button class="pcard" type="button" data-level="${l.v}" aria-pressed="${cur === l.v}">
+        <span class="idx tl">${l.v}</span><span class="lbl">${l.label}</span>
+        <span class="pips">${[1, 2, 3].map(i => `<i class="${i <= l.v ? "on" : ""}"></i>`).join("")}</span>
+        <span class="idx br">${l.v}</span>
+      </button>`).join("")}
+    </div>
+  </section>`;
 }
 
 function hitPanel(h, i, inner) {
@@ -581,6 +610,7 @@ function viewBoss() {
       <div class="bf-sprite">${animSprite("boss")}</div>
       <div class="bf-hp"><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span>${hits}/4</span></div>
     </div>` : ""}
+    ${levelDeck("github", "GitHub")}
     <div class="calm">
       <strong>Fehler passieren hier – alles easy.<span class="emo emo-after">🙌</span></strong>
       Fragt eure KI des Vertrauens. Wenn etwas nicht gleich funktioniert, probiert es nochmal – oder macht erst mit der nächsten Aufgabe weiter und kommt später zurück.
@@ -778,6 +808,22 @@ function bind() {
       setTimeout(() => go("#map"), was ? 0 : 900);
     };
   }
+
+  // Erfahrungslevel: Karte ziehen (ohne Neu-Rendern, damit Eingaben erhalten bleiben)
+  const howto = document.getElementById("howto"), combo = document.getElementById("combo");
+  if (howto && combo) howto.ontoggle = () => combo.classList.toggle("collapsed", !howto.open);
+  document.querySelectorAll("[data-level-for]").forEach(deck => {
+    deck.onanimationend = e => e.target.classList.remove("flip");
+    deck.querySelectorAll("[data-level]").forEach(b => b.onclick = () => {
+      const v = Number(b.dataset.level);
+      state.levels[deck.dataset.levelFor] = v; save();
+      deck.classList.add("picked");
+      deck.querySelectorAll(".pcard").forEach(c => { const on = c === b; c.setAttribute("aria-pressed", String(on)); c.classList.toggle("flip", on); });
+      if (howto) howto.open = v < 2;
+      const video = document.getElementById("video");
+      if (video) video.className = `note ${v === 0 ? "hot" : "info"}`;
+    });
+  });
 
   // Boss
   const gh = document.getElementById("ghuser");

@@ -69,6 +69,17 @@ window.SB = (() => {
     ],
   };
 
+  /* Erfahrungslevel pro App (Selbsteinschätzung, gibt keine Punkte).
+     Gilt für alle Apps mit E-Mail-Angabe und für GitHub. */
+  const LEVELS = [
+    { v: 0, label: "Nie benutzt" },
+    { v: 1, label: "Mal reingeschaut" },
+    { v: 2, label: "Nutze ich ab und zu" },
+    { v: 3, label: "Check ich" },
+  ];
+  const LEVEL_TOOLS = [...TASKS.filter(t => !t.noEmail).map(t => t.id), "github"];
+  const validLevel = v => Number.isInteger(v) && v >= 0 && v <= 3;
+
   const RANKS = [
     [0, "Neu im Spiel"],
     [25, "Setup-Entdecker:in"],
@@ -81,7 +92,7 @@ window.SB = (() => {
 
   /* Rohzustand, wie er im Browser (localStorage) liegt */
   const blank = () => ({
-    name: "", email: "", tasks: {}, boss: {}, last: null,
+    name: "", email: "", tasks: {}, boss: {}, levels: {}, last: null,
     os: typeof navigator !== "undefined" && /Win/i.test(navigator.platform) ? "win" : "mac",
     consent: null, // { accepted, at, policyUrl }
     leaderboard: null, // { optIn, gamerName, at }
@@ -113,6 +124,7 @@ window.SB = (() => {
       const x = raw.boss[h.id];
       if (isObj(x)) st.boss[h.id] = { done: x.done === true, ...(h.id === "account" && typeof x.user === "string" ? { user: x.user } : {}) };
     });
+    if (isObj(raw.levels)) LEVEL_TOOLS.forEach(id => { if (validLevel(raw.levels[id])) st.levels[id] = raw.levels[id]; });
     if (isObj(raw.consent) && raw.consent.accepted === true) st.consent = { accepted: true, at: str(raw.consent.at), policyUrl: str(raw.consent.policyUrl) };
     if (isObj(raw.leaderboard)) st.leaderboard = {
       optIn: raw.leaderboard.optIn === true && validGamerName(raw.leaderboard.gamerName),
@@ -148,6 +160,7 @@ window.SB = (() => {
     TASKS.forEach(t => {
       const raw = st.tasks[t.id] || {};
       tools[t.id] = t.noEmail ? { done: !!raw.done } : { done: !!raw.done, email: raw.email || null };
+      if (!t.noEmail) tools[t.id].level = validLevel(st.levels[t.id]) ? st.levels[t.id] : null;
       if (t.id === "google") tools.google.accountType = raw.has || null; // "gmail" | "other" | "none"
       if (t.id === "gear") { tools.gear.mustHaves = (raw.items || []).length; tools.gear.bonusItems = raw.bonus || []; }
       if (t.id === "calendar") tools.calendar.app = raw.app || null; // "google" | "apple" | "outlook"
@@ -168,6 +181,7 @@ window.SB = (() => {
       github: {
         username: user,
         profileUrl: user ? `https://github.com/${user}` : null,
+        level: validLevel(st.levels.github) ? st.levels.github : null,
         hits,
         defeated: Object.values(hits).every(Boolean),
       },
@@ -194,5 +208,5 @@ window.SB = (() => {
   const TASK_EMOJI = Object.fromEntries(TASKS.filter(t => t.emoji).map(t => [t.id, t.emoji]));
   const ICONS = { google: "google", slack: "slack", miro: "miro", figma: "figma", jira: "jira", claude: "claude", chatgpt: "openai", github: "github" };
 
-  return { WORLDS, GEAR, RULES, CALENDAR_APPS, TASK_EMOJI, esc, ICON_CDN, ICONS, containsRealName, sanitize, clear, validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
+  return { LEVELS, LEVEL_TOOLS, validLevel, WORLDS, GEAR, RULES, CALENDAR_APPS, TASK_EMOJI, esc, ICON_CDN, ICONS, containsRealName, sanitize, clear, validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
 })();

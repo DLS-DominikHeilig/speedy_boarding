@@ -14,6 +14,8 @@ const FIELDS = [
   ["tools.gear.bonusItems", "string[]", `Freiwillige Bonus-Items: ${SB.GEAR.bonus.map(g => g.id).join(", ")}. Geben keine Punkte.`],
   ["tools.calendar.app", '"google" | "apple" | "outlook" | null', "Gewählte Kalender-App beim Abo."],
   ["tools.google.accountType", '"gmail" | "other" | "none" | null', "Art des Google-Kontos. „other“ = Google-Konto mit Nicht-Gmail-Adresse (Posteo, Proton, eigene Domain). „none“ = musste neu angelegt werden."],
+  ...SB.TASKS.filter(t => !t.noEmail).map(t => [`tools.${t.id}.level`, "0 | 1 | 2 | 3 | null", `Erfahrungslevel ${t.name} (Selbsteinschätzung per Karte, keine Punkte): ${SB.LEVELS.map(l => `${l.v} = ${l.label}`).join(", ")}. null = keine Karte gezogen.`]),
+  ["github.level", "0 | 1 | 2 | 3 | null", "Erfahrungslevel GitHub, wie bei den Apps."],
   ["github.username", "string | null", "Aus dem Profil-Link geparst (Link oder reiner Name werden akzeptiert)."],
   ["github.profileUrl", "string | null", "Normalisiert: https://github.com/&lt;username&gt;"],
   ...SB.BOSS.hits.map(h => [`github.hits.${h.id}`, "boolean", `Treffer „${h.title}“ (+${h.points}). Selbstauskunft per Haken${h.id === "account" ? ", zusätzlich Profil-Link" : ""}.`]),
@@ -39,6 +41,7 @@ const EXAMPLE = Object.assign(SB.blank(), {
     claude: { done: true, email: "lea@posteo.de" },
   },
   boss: { account: { done: true, user: "lea-mueller" }, git: { done: true } },
+  levels: { google: 3, slack: 2, miro: 2, figma: 1, jira: 0, claude: 2, github: 0 },
 });
 
 function highlight(json) {
