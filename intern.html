@@ -129,6 +129,7 @@
         <tr><td>Speicherung im Browser</td><td>Alles im localStorage. Bleibt auf geteilten Rechnern stehen.</td><td>Button „Meine Daten löschen“. Nach erfolgreicher Übertragung lokale Kopie leeren.</td></tr>
         <tr><td>Übertragung</td><td>Noch keine.</td><td>Nur per HTTPS, mit dem Magic-Link-Token als Berechtigung. Serverseitig prüfen (E-Mail-Format, GitHub-Name) und Anfragen begrenzen, damit niemand fremde Daten einschleust.</td></tr>
         <tr><td>Eingaben</td><td>✓ Name und Eingaben werden vor der Anzeige maskiert (Schutz vor eingeschleustem HTML/JS).</td><td>Serverseitig ebenso maskieren, z. B. vor dem Schreiben in Sheets (Formel-Injection mit <code>=</code>).</td></tr>
+        <tr><td>Leaderboard</td><td>✓ Nur mit Opt-in auf der Map, nur selbst gewählter Gamer-Name. Echte Namensteile werden abgelehnt, Austritt jederzeit möglich.</td><td>Opt-in-Zeitpunkt speichern (ist im Payload), Leaderboard nur für eingeloggte Kohorten-Mitglieder zeigen, Gamer-Namen moderieren.</td></tr>
         <tr><td>Löschfristen</td><td>–</td><td>Festlegen, wann Onboarding-Daten gelöscht werden, z. B. nach Kursende.</td></tr>
         <tr><td>Screenshots im Repo</td><td>✓ Screenshots mit echtem Account wurden entfernt, auch aus der Git-Historie.</td><td>Falls Anleitungen Bilder bekommen: nur neutrale Beispiel-Accounts verwenden.</td></tr>
       </tbody>
@@ -157,6 +158,9 @@ const FIELDS = [
   ["participant.defaultEmail", "string | null", "Standard-E-Mail von der Startseite. Wird bei jeder Aufgabe vorgeschlagen."],
   ["consent.privacyNoticeAccepted", "boolean", "Haken „Datenschutzerklärung der DL School gelesen“ auf der Startseite. Ohne Haken geht es nicht weiter."],
   ["consent.acceptedAt", "string (ISO 8601) | null", "Zeitpunkt, an dem der Haken gesetzt wurde."],
+  ["leaderboard.optIn", "boolean", "Freiwillig auf der Map: im Leaderboard erscheinen. Jederzeit widerrufbar."],
+  ["leaderboard.gamerName", "string | null", "Selbst gewählter Fantasiename (3–20 Zeichen). Wird abgelehnt, wenn er Teile des echten Namens enthält."],
+  ["leaderboard.optedInAt", "string (ISO 8601) | null", "Zeitpunkt des Opt-ins."],
   ["consent.policyUrl", "string | null", "Version bzw. URL der Datenschutzerklärung, die galt."],
   ...SB.TASKS.map(t => [`tools.${t.id}.done`, "boolean", `${t.name}: Aufgabe abgeschlossen (+${t.points} Punkte).`]),
   ...SB.TASKS.map(t => [`tools.${t.id}.email`, "string | null", `E-Mail, die für ${t.name} genutzt wird bzw. an die wir einladen.`]),
@@ -177,6 +181,7 @@ const FIELDS = [
 const EXAMPLE = Object.assign(SB.blank(), {
   name: "Lea Müller", email: "lea@posteo.de", os: "mac", updatedAt: "2026-11-12T10:42:00.000Z",
   consent: { accepted: true, at: "2026-11-12T10:30:12.000Z", policyUrl: "https://school.digitale-leute.de/datenschutz" },
+  leaderboard: { optIn: true, gamerName: "PixelQueen", at: "2026-11-12T10:41:05.000Z" },
   tasks: {
     google: { done: true, email: "lea@posteo.de", has: "other" },
     slack: { done: true, email: "lea@posteo.de" },

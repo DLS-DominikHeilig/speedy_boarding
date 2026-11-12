@@ -135,6 +135,13 @@
   .boss-card.defeated { border-color: var(--petrol); background: #F3FAF8; }
   .boss-card .cursor { position: absolute; left: 90px; bottom: 6px; }
 
+  .lb-card { margin-top: 22px; padding: 20px 24px; }
+  .lb-row { display: flex; gap: 18px; align-items: flex-start; }
+  .lb-ico { width: 54px; flex: none; margin-top: 4px; }
+  .lb-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; max-width: 520px; }
+  .lb-form input { flex: 1; min-width: 180px; }
+  .lb-actions { display: flex; gap: 14px; }
+  @media (max-width: 520px) { .lb-row { flex-direction: column; } .lb-ico { width: 40px; } }
   .map-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 60px; flex-wrap: wrap; color: var(--soft); font-size: .9rem; }
 
   /* ---------- Aufgabe ---------- */
@@ -535,6 +542,36 @@ function viewStart() {
   </div></main>`;
 }
 
+/* ---------- Leaderboard: freiwillig, mit Gamer-Name ---------- */
+const GN_A = ["Pixel", "Turbo", "Agile", "Mega", "Retro", "Sprint", "Backlog", "Roadmap", "Neon", "Quantum", "Ninja", "Laser"];
+const GN_B = ["PM", "Owner", "Boss", "Hero", "Wizard", "Pilot", "Ranger", "Captain", "Explorer", "Builder"];
+const randomGamerName = () => GN_A[Math.floor(Math.random() * GN_A.length)] + GN_B[Math.floor(Math.random() * GN_B.length)] + (10 + Math.floor(Math.random() * 90));
+function leaderboardCard() {
+  const lb = state.leaderboard;
+  if (lb && lb.optIn) return `<section class="card lb-card">
+    <div class="lb-row"><span class="lb-ico">${sprite("trophy")}</span>
+      <div style="flex:1"><span class="eyebrow">Leaderboard · freiwillig</span>
+        <p style="margin:4px 0 0">Du erscheinst im Leaderboard als <strong>${esc(lb.gamerName)}</strong>. Dein echter Name bleibt verborgen.</p></div>
+      <div class="lb-actions"><button class="btn btn-ghost" type="button" id="lbEdit">Ändern</button><button class="btn btn-ghost" type="button" id="lbOut">Austreten</button></div>
+    </div></section>`;
+  const name = (lb && lb.draft) || "";
+  return `<section class="card lb-card">
+    <div class="lb-row"><span class="lb-ico">${sprite("trophy")}</span>
+      <div style="flex:1">
+        <span class="eyebrow">Leaderboard · freiwillig</span>
+        <h3 style="font-size:1.3rem;margin:4px 0 6px">Willst du ins Leaderboard?</h3>
+        <p style="margin:0 0 12px;color:var(--muted)">Andere Teilnehmende sehen dort nur deinen <strong>Gamer-Namen</strong> und deine Punkte, nicht deinen echten Namen. Du kannst jederzeit wieder austreten.</p>
+        <div class="lb-form">
+          <input type="text" id="gn" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Dein Gamer-Name" value="${esc(name)}" aria-label="Gamer-Name">
+          <button class="btn btn-ghost lb-dice" type="button" id="gnDice" title="Zufälligen Namen vorschlagen"><span class="emo">🎲</span>Vorschlag</button>
+        </div>
+        <small id="gnHint" style="color:var(--soft)">3–20 Zeichen: Buchstaben, Ziffern, Leerzeichen, _ und -. Bitte nicht deinen echten Namen.</small>
+        <label class="check"><input type="checkbox" id="lbOk"> Ich möchte mit diesem Gamer-Namen im Leaderboard erscheinen.</label>
+        <div style="margin-top:14px"><button class="btn btn-primary" type="button" id="lbJoin">Ins Leaderboard</button></div>
+      </div>
+    </div></section>`;
+}
+
 function viewMap() {
   const hits = bossHits().length, bossDone = hits === BOSS.hits.length;
   const stations = TASKS.map(t => {
@@ -568,6 +605,7 @@ function viewMap() {
         <div class="pts-col"><span class="pts">+${BOSS.points}</span></div>
       </button>
     </div>
+    ${leaderboardCard()}
     <div class="map-foot">
       <span>Dein Fortschritt wird in diesem Browser gespeichert. · <a href="https://school.digitale-leute.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a> · <a href="intern.html"><span class="emo">🛠️</span>Datenstruktur</a> · <a href="results.html"><span class="emo">📊</span>Team-Ansicht</a></span>
       ${score() === MAX ? `<a class="btn btn-dark" href="#finish">Zum Ziel<span class="emo emo-after">🏆</span></a>` : ""}
@@ -837,6 +875,32 @@ function bind() {
       if (el) el.scrollIntoView({ block: "start" });
     }, 900);
   });
+
+  // Leaderboard
+  const gn = document.getElementById("gn");
+  if (gn) {
+    const ok = document.getElementById("lbOk"), join = document.getElementById("lbJoin"), hint = document.getElementById("gnHint");
+    const realParts = (state.name || "").toLowerCase().split(/\s+/).filter(x => x.length > 2);
+    const check = () => {
+      const v = gn.value.trim(), valid = SB.validGamerName(v), real = realParts.some(x => v.toLowerCase().includes(x));
+      gn.classList.toggle("bad", !!v && (!valid || real));
+      hint.textContent = real ? "Das sieht nach deinem echten Namen aus. Wähl lieber einen Fantasienamen." : "3–20 Zeichen: Buchstaben, Ziffern, Leerzeichen, _ und -. Bitte nicht deinen echten Namen.";
+      join.disabled = !(valid && !real && ok.checked);
+    };
+    gn.oninput = () => { state.leaderboard = Object.assign(state.leaderboard || {}, { draft: gn.value }); save(); check(); };
+    ok.onchange = check;
+    document.getElementById("gnDice").onclick = () => { gn.value = randomGamerName(); gn.oninput(); };
+    join.onclick = () => {
+      state.leaderboard = { optIn: true, gamerName: gn.value.trim(), at: new Date().toISOString() };
+      save(); toast("🏆"); setTimeout(route, 700);
+    };
+    check();
+  }
+  const lbOut = document.getElementById("lbOut");
+  if (lbOut) {
+    lbOut.onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName }; save(); route(); };
+    document.getElementById("lbEdit").onclick = () => { state.leaderboard = { optIn: false, draft: state.leaderboard.gamerName }; save(); route(); document.getElementById("gn").focus(); };
+  }
 
   // Allgemein
   document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));

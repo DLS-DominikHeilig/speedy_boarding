@@ -43,6 +43,7 @@ window.SB = (() => {
     name: "", email: "", tasks: {}, boss: {}, last: null,
     os: typeof navigator !== "undefined" && /Win/i.test(navigator.platform) ? "win" : "mac",
     consent: null, // { accepted, at, policyUrl }
+    leaderboard: null, // { optIn, gamerName, at }
     updatedAt: null,
   });
   function load() {
@@ -80,6 +81,9 @@ window.SB = (() => {
       consent: st.consent
         ? { privacyNoticeAccepted: !!st.consent.accepted, acceptedAt: st.consent.at || null, policyUrl: st.consent.policyUrl || null }
         : { privacyNoticeAccepted: false, acceptedAt: null, policyUrl: null },
+      leaderboard: st.leaderboard && st.leaderboard.optIn
+        ? { optIn: true, gamerName: st.leaderboard.gamerName || null, optedInAt: st.leaderboard.at || null }
+        : { optIn: false, gamerName: null, optedInAt: null },
       tools,
       github: {
         username: user,
@@ -92,5 +96,8 @@ window.SB = (() => {
     };
   }
 
-  return { SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
+  /* Gamer-Name: 3–20 Zeichen, Buchstaben/Ziffern/Leerzeichen/_/-, keine E-Mail */
+  const validGamerName = n => /^[\p{L}\p{N} _-]{3,20}$/u.test((n || "").trim());
+
+  return { validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
 })();
