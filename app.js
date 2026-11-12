@@ -436,6 +436,7 @@ function emailField(t) {
 }
 
 /* ---------- Startrampe: Ausrüstung, Spielregeln, Kalender ---------- */
+let justFlipped = null; // nur diese Karte bekommt die Dreh-Animation
 const taskState = id => state.tasks[id] || {};
 function customReady(id) {
   const x = taskState(id);
@@ -465,7 +466,7 @@ function rulesBody() {
   return `<div class="card panel">
     <h2>Spielregeln <span class="count">${seen.length}/${SB.RULES.length} aufgedeckt</span></h2>
     <div class="rules-grid">${SB.RULES.map((r, i) => seen.includes(r.id)
-      ? `<div class="rule open"><span class="rule-emo" aria-hidden="true">${r.emoji}</span><strong>${r.title}</strong><small>${r.text}</small></div>`
+      ? `<div class="rule open${r.id === justFlipped ? " flip-in" : ""}"><span class="rule-emo" aria-hidden="true">${r.emoji}</span><strong>${r.title}</strong><small>${r.text}</small></div>`
       : `<button type="button" class="rule closed" data-rule="${r.id}" aria-label="Regel ${i + 1} aufdecken"><span class="rule-q">?</span><span class="rule-n">${String(i + 1).padStart(2, "0")}</span></button>`).join("")}</div>
     <label class="check pledge${all ? "" : " locked"}"><input type="checkbox" id="pledge" ${x.pledge ? "checked" : ""} ${all ? "" : "disabled"}> <span>Ich bin dabei<span class="emo emo-after">🤝</span> Ich halte mich an die Spielregeln.${all ? "" : " <em>(erst alle Karten aufdecken)</em>"}</span></label>
   </div>`;
@@ -576,6 +577,10 @@ function viewBoss() {
       </div>
       <div class="boss-sprite" id="bossSprite" style="position:relative">${hits === 4 ? sprite("bossDown") : animSprite("boss")}</div>
     </div>
+    ${hits < 4 ? `<div class="boss-float" id="bossFloat" aria-hidden="true">
+      <div class="bf-sprite">${animSprite("boss")}</div>
+      <div class="bf-hp"><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span>${hits}/4</span></div>
+    </div>` : ""}
     <div class="calm">
       <strong>Fehler passieren hier – alles easy.<span class="emo emo-after">🙌</span></strong>
       Fragt eure KI des Vertrauens. Wenn etwas nicht gleich funktioniert, probiert es nochmal – oder macht erst mit der nächsten Aufgabe weiter und kommt später zurück.
@@ -687,6 +692,15 @@ function toast(text) {
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1100);
 }
 
+/* Belohnungs-Klicks sperren, bis Animation und Seitenwechsel durch sind (kein Doppelklick-Farmen) */
+let rewardLock = false;
+function lockReward(btn) {
+  if (rewardLock) return false;
+  rewardLock = true; if (btn) btn.disabled = true;
+  setTimeout(() => { rewardLock = false; }, 1000);
+  return true;
+}
+
 function parseGitHub(v) {
   v = v.trim().replace(/\/+$/, "");
   const m = v.match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([^\/?#\s]+)/i);
@@ -723,7 +737,8 @@ function bind() {
     save(); keepScroll();
   });
   document.querySelectorAll("[data-rule]").forEach(b => b.onclick = () => {
-    const x = ensure("rules"); x.seen = [...new Set([...(x.seen || []), b.dataset.rule])]; save(); keepScroll();
+    const x = ensure("rules"); x.seen = [...new Set([...(x.seen || []), b.dataset.rule])]; save();
+    justFlipped = b.dataset.rule; keepScroll(); justFlipped = null;
   });
   const pledge = document.getElementById("pledge");
   if (pledge) pledge.onchange = () => { const x = ensure("rules"); x.pledge = pledge.checked; if (!pledge.checked) x.done = false; save(); keepScroll(); };
@@ -733,7 +748,7 @@ function bind() {
   const cdone = document.getElementById("cdone");
   if (cdone) cdone.onclick = () => {
     const id = location.hash.slice(6), t = TASKS.find(x => x.id === id);
-    if (!customReady(id)) return;
+    if (!customReady(id) || !lockReward(cdone)) return;
     const was = taskDone(id);
     ensure(id).done = true; save();
     if (!was) toast(`+${t.points}!`);
@@ -754,7 +769,7 @@ function bind() {
     });
     upd();
     tdone.onclick = () => {
-      if (!ok()) return;
+      if (!ok() || !lockReward(tdone)) return;
       const was = taskDone(id);
       state.tasks[id] = Object.assign(state.tasks[id] || {}, { done: true, email: tm.value.trim() });
       if (!state.email) state.email = tm.value.trim();
@@ -774,14 +789,16 @@ function bind() {
   document.querySelectorAll("[data-hit]").forEach(b => b.onclick = () => {
     const id = b.dataset.hit, h = BOSS.hits.find(x => x.id === id);
     const cur = state.boss[id] && state.boss[id].done;
+    if (rewardLock) return;
     if (cur) { state.boss[id] = Object.assign(state.boss[id], { done: false }); save(); route(); document.getElementById("hit-" + id).scrollIntoView({ block: "center" }); return; }
     if (id === "account") {
       const n = parseGitHub(gh.value);
       if (!n) { gh.classList.add("bad"); gh.focus(); document.getElementById("ghhint").textContent = "Bitte zuerst deinen Profil-Link oder Benutzernamen eintragen."; return; }
       state.boss.account = { done: true, user: n };
     } else state.boss[id] = { done: true };
+    lockReward(b);
     save();
-    const sp = document.getElementById("bossSprite"); sp.classList.add("shake");
+    document.querySelectorAll("#bossSprite, #bossFloat .bf-sprite").forEach(el => el.classList.add("shake"));
     toast(`+${h.points}!`);
     setTimeout(() => {
       if (bossHits().length === BOSS.hits.length) { go("#map"); return; }
@@ -791,6 +808,12 @@ function bind() {
       if (el) el.scrollIntoView({ block: "start" });
     }, 900);
   });
+
+  // Schwebender Boss: erscheint, sobald der große Boss aus dem Bild scrollt
+  const bf = document.getElementById("bossFloat"), heroBox = document.querySelector(".boss-hero");
+  if (bf && heroBox && "IntersectionObserver" in window) {
+    new IntersectionObserver(([e]) => bf.classList.toggle("show", !e.isIntersecting), { threshold: 0 }).observe(heroBox);
+  }
 
   // Leaderboard
   const gn = document.getElementById("gn");
@@ -806,6 +829,7 @@ function bind() {
     ok.onchange = check;
     document.getElementById("gnDice").onclick = () => { gn.value = randomGamerName(); gn.oninput(); };
     join.onclick = () => {
+      if (!lockReward(join)) return;
       const prev = state.leaderboard || {};
       state.leaderboard = { optIn: true, gamerName: gn.value.trim(), at: prev.optIn ? prev.at : new Date().toISOString(), seen: true };
       lbEditing = false;

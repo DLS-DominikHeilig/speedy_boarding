@@ -190,7 +190,8 @@
   .item.on.bonus .item-state { background: var(--yellow); }
   .rules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .rule { min-height: 150px; border-radius: 12px; padding: 14px; display: grid; align-content: start; gap: 6px; text-align: left; }
-  .rule.open { border: 2px solid var(--line); background: #fff; animation: flip .35s ease-out; }
+  .rule.open { border: 2px solid var(--line); background: #fff; }
+  .rule.open.flip-in { animation: flip .35s ease-out; }
   .rule.open small { color: var(--muted); font-size: .85rem; line-height: 1.45; }
   .rule-emo { font-size: 1.5rem; }
   .rule.closed { border: 0; cursor: pointer; color: #fff; place-items: center; align-content: center; font: inherit; position: relative;
@@ -261,6 +262,17 @@
   .boss-hero .hp span { color: #fff; }
   .boss-hero .boss-sprite.shake { animation: shake .4s; }
   @keyframes shake { 20% { transform: translateX(-6px) rotate(-3deg); } 40% { transform: translateX(6px) rotate(3deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .boss-float { position: fixed; right: 20px; bottom: 20px; z-index: 40; width: 136px; padding: 12px 12px 10px; border-radius: 18px; background: var(--dark); box-shadow: var(--shadow-lg);
+    opacity: 0; transform: translateY(24px) scale(.9); pointer-events: none; transition: opacity .25s, transform .25s; }
+  .boss-float.show { opacity: 1; transform: none; }
+  .bf-sprite { width: 92px; margin: 0 auto 8px; animation: float 2.6s ease-in-out infinite; }
+  .bf-sprite.shake { animation: shake .4s; }
+  .bf-hp { display: flex; align-items: center; gap: 8px; }
+  .bf-hp .bar { height: 8px; background: #444; }
+  .bf-hp .bar i { background: repeating-linear-gradient(90deg, var(--red) 0 8px, #d81e3f 8px 10px); }
+  .bf-hp span { font: 700 11px "JetBrains Mono", monospace; color: #fff; }
+  @keyframes float { 50% { transform: translateY(-7px); } }
+  @media (max-width: 520px) { .boss-float { width: 104px; right: 12px; bottom: 12px; } .bf-sprite { width: 68px; } }
   .calm { background: var(--yellow); border-radius: 16px; padding: 18px 22px; font-weight: 600; margin: 16px 0; }
   .calm strong { display: block; font-size: 1.1rem; margin-bottom: 4px; letter-spacing: -0.02em; }
   .hit { border-left: 6px solid var(--line); }
