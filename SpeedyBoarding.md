@@ -83,18 +83,12 @@ Dauer: ca. 5 Minuten.
    👉 **https://github.com/settings/tokens/new?scopes=repo&description=PM%20Bootcamp**
 3. **„Confirm access“:** GitHub fragt zur Sicherheit noch einmal nach. Meist kommt ein **Code per E-Mail** (Spam-Ordner prüfen!), je nach Account auch per App oder Passkey. Code eingeben, dann **Verify** klicken.
 
-   ![Confirm access](docs/img/github-token-01-confirm-access.png)
-
 4. Das Formular prüfen:
    - **Note:** `PM Bootcamp`, ein frei wählbarer Name, damit du den Token später wiedererkennst
    - **Expiration:** **90 days** wählen. GitHub stellt bei jedem neuen Token wieder 30 Tage ein, also bitte umstellen. **Nicht „No expiration“**: Ein Token ohne Ablaufdatum gilt ewig, falls er in falsche Hände gerät.
    - **Select scopes:** **nur `repo`** angehakt (die Unterpunkte werden automatisch mit angehakt). **Alles andere leer lassen.**
 
-   ![Token-Formular](docs/img/github-token-05-form-overview.png)
-
 5. Ganz nach unten scrollen, dann **Generate token** klicken.
-
-   ![Generate token](docs/img/github-token-04-generate-button.png)
 
 6. Den Token (beginnt mit `ghp_`) mit dem **Kopier-Symbol** daneben kopieren. **Die Seite offen lassen**, bis Teil B geklappt hat, denn der Token wird nur einmal angezeigt.
 

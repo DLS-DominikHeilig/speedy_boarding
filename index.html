@@ -30,6 +30,7 @@
   button { font: inherit; }
   .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
   .mono { font-family: "JetBrains Mono", monospace; }
+  .anim { display: block; }
   .pixel { image-rendering: pixelated; shape-rendering: crispEdges; display: block; }
 
   /* ---------- Buttons & Bausteine ---------- */
@@ -312,7 +313,7 @@ const SPRITES = {
     "....hhhh....",
     "...hhhhhh...",
     "...hsssss...",
-    "...sksksk...",
+    "...skssks...",
     "...ssssss...",
     "....ssss....",
     "..tttttttt..",
@@ -391,6 +392,37 @@ const SPRITES = {
     "..kkkkkkkk..",
   ],
 };
+/* ---------- Animation: Blinzeln & Umschauen ---------- */
+const ANIM = {
+  hero: { row: 3, gazes: ["c", "l", "r"], frames: {
+    c: ["...skssks..."], l: ["...ksskss..."], r: ["...sskssk..."], b: ["...ssssss..."] } },
+  boss: { row: 4, gazes: ["r", "l"], frames: {
+    r: ["rrrwwwrrrrwwwrrr", "rrrwkkrrrrwkkrrr", "rrrwkkrrrrwkkrrr"],
+    l: ["rrrwwwrrrrwwwrrr", "rrrkkwrrrrkkwrrr", "rrrkkwrrrrkkwrrr"],
+    b: ["rrrrrrrrrrrrrrrr", "rrrkkkrrrrkkkrrr", "rrrrrrrrrrrrrrrr"] } },
+};
+Object.entries(ANIM).forEach(([name, a]) => Object.entries(a.frames).forEach(([k, rows]) => {
+  const v = SPRITES[name].slice(); v.splice(a.row, rows.length, ...rows); SPRITES[`${name}_${k}`] = v;
+}));
+const animSprite = name => `<span class="anim" data-anim="${name}">${sprite(name)}</span>`;
+const rnd = () => 500 + Math.random() * 500; // 0,5–1,0 s, unregelmäßig
+function startAnims() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll("[data-anim]").forEach(el => {
+    if (el._anim) return; el._anim = true;
+    const a = ANIM[el.dataset.anim], name = el.dataset.anim;
+    let gaze = a.gazes[0];
+    const show = k => { if (el.isConnected) el.innerHTML = sprite(`${name}_${k}`); };
+    const tick = () => {
+      if (!el.isConnected) return;
+      if (Math.random() < 0.4) { show("b"); setTimeout(() => show(gaze), 110 + Math.random() * 80); }
+      else { const others = a.gazes.filter(g => g !== gaze); gaze = others[Math.floor(Math.random() * others.length)]; show(gaze); }
+      setTimeout(tick, rnd());
+    };
+    setTimeout(tick, rnd());
+  });
+}
+
 function sprite(name, cls = "") {
   const rows = SPRITES[name], h = rows.length, w = rows[0].length;
   let r = "";
@@ -489,8 +521,8 @@ function viewStart() {
       <div class="coin" style="left:30%;top:28%">${sprite("coin")}</div>
       <div class="coin" style="left:40%;top:20%;animation-delay:.3s">${sprite("coin")}</div>
       <div class="coin" style="left:50%;top:28%;animation-delay:.6s">${sprite("coin")}</div>
-      <div class="hero">${sprite("hero")}</div>
-      <div class="boss">${sprite("boss")}<span style="position:absolute;left:55%;top:55%">${cursor("End Boss 49")}</span></div>
+      <div class="hero">${animSprite("hero")}</div>
+      <div class="boss">${animSprite("boss")}<span style="position:absolute;left:55%;top:55%">${cursor("End Boss 49")}</span></div>
       <div class="cursor" style="left:6%;top:40%">${cursor(firstName(), "var(--blue)").replace(/^<span class="cursor">|<\/span>$/g, "")}</div>
       <div class="ground"></div>
     </div>
@@ -520,7 +552,7 @@ function viewMap() {
     </section>
     <div class="boss-row">
       <button class="card boss-card${bossDone ? " defeated" : ""}" type="button" data-go="#boss">
-        ${sprite(bossDone ? "bossDown" : "boss")}
+        ${bossDone ? sprite("bossDown") : animSprite("boss")}
         <div>
           <span class="eyebrow">${bossDone ? "Besiegt" : "Endboss"}</span>
           <h3>GitHub</h3>
@@ -615,7 +647,7 @@ function viewBoss() {
         <p>Hier kommt dein Code ins Netz. Vier Treffer, und der Boss liegt am Boden.</p>
         <div class="hp"><span class="mono" style="font-size:12px;font-weight:700">HP</span><div class="bar"><i style="width:${100 - hits * 25}%"></i></div><span class="mono" style="font-size:12px">${hits}/4</span></div>
       </div>
-      <div class="boss-sprite" id="bossSprite" style="position:relative">${sprite(hits === 4 ? "bossDown" : "boss")}</div>
+      <div class="boss-sprite" id="bossSprite" style="position:relative">${hits === 4 ? sprite("bossDown") : animSprite("boss")}</div>
     </div>
     <div class="calm">
       <strong>Fehler passieren hier – alles easy.<span class="emo emo-after">🙌</span></strong>
@@ -714,6 +746,7 @@ function route() {
   save();
   window.scrollTo(0, 0);
   bind();
+  startAnims();
 }
 function go(h) { if (location.hash === h) route(); else location.hash = h; }
 

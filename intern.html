@@ -66,7 +66,7 @@
     <span class="eyebrow">Ablauf</span>
     <h2>Woher die Daten kommen</h2>
     <div class="flow">
-      <div><strong>Magic Link</strong>Wir verschicken <code>…/?name=Vor%20Nach&amp;email=…</code>. Name und optional E-Mail werden übernommen und aus der URL entfernt.</div>
+      <div class="todo"><strong>Magic Link (offen)</strong>Wie und von wo der Link verschickt wird, ist noch offen. Der Prototyp liest <code>…/?name=Vor%20Nach&amp;email=…</code>, übernimmt die Werte und entfernt sie aus der URL.</div>
       <div><strong>Eingaben</strong>Datenschutz-Haken, Standard-E-Mail, E-Mail pro Tool, Google-Kontotyp, GitHub-Profil-Link, abgehakte Schritte.</div>
       <div><strong>localStorage</strong>Alles liegt im Browser unter <code id="keyName"></code>. Es verlässt den Rechner derzeit <strong>nicht</strong>.</div>
       <div class="todo"><strong>Übertragung (offen)</strong><code>SB.payload(state)</code> liefert das JSON. Ziel noch festzulegen, z. B. Google Sheets per Apps Script.</div>
@@ -130,7 +130,7 @@
         <tr><td>Übertragung</td><td>Noch keine.</td><td>Nur per HTTPS, mit dem Magic-Link-Token als Berechtigung. Serverseitig prüfen (E-Mail-Format, GitHub-Name) und Anfragen begrenzen, damit niemand fremde Daten einschleust.</td></tr>
         <tr><td>Eingaben</td><td>✓ Name und Eingaben werden vor der Anzeige maskiert (Schutz vor eingeschleustem HTML/JS).</td><td>Serverseitig ebenso maskieren, z. B. vor dem Schreiben in Sheets (Formel-Injection mit <code>=</code>).</td></tr>
         <tr><td>Löschfristen</td><td>–</td><td>Festlegen, wann Onboarding-Daten gelöscht werden, z. B. nach Kursende.</td></tr>
-        <tr><td>Screenshots im Repo</td><td>⚠️ <code>docs/img/</code> zeigt einen echten GitHub-Account und eine gekürzte E-Mail.</td><td>Vor dem Live-Gang durch neutrale Beispiel-Screenshots ersetzen.</td></tr>
+        <tr><td>Screenshots im Repo</td><td>✓ Screenshots mit echtem Account wurden entfernt, auch aus der Git-Historie.</td><td>Falls Anleitungen Bilder bekommen: nur neutrale Beispiel-Accounts verwenden.</td></tr>
       </tbody>
     </table>
   </section>
@@ -139,6 +139,7 @@
     <span class="eyebrow">Offen</span>
     <h2>Entscheidungen fürs Dev-Team</h2>
     <ul class="q">
+      <li><strong>Versand des Magic Links:</strong> Wer verschickt ihn (CRM, Mail-Tool, Skript), wann (nach Vertragsabschluss?) und mit welchem Inhalt?</li>
       <li><strong>Ziel der Übertragung:</strong> Google Sheets (Apps Script Web-App), Airtable, CRM oder eigene API?</li>
       <li><strong>Zeitpunkt:</strong> nach jeder Aufgabe (Fortschritt live sichtbar) oder einmal am Ende?</li>
       <li><strong>Identifikation:</strong> Der Magic Link enthält bisher nur den Namen. Für eindeutige Zuordnung braucht es eine ID oder einen signierten Token im Link, z. B. <code>?id=…</code>.</li>
