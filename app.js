@@ -4,7 +4,26 @@
    ========================================================= */
 const ICON_CDN = SB.ICON_CDN;
 
+/* Kurskalender: vor Kursstart die echte URL der Kohorte eintragen */
+const CALENDAR_URL = "https://pm.digitale-leute.de/batch-XX-26/calendar/online-sessions";
+const CALENDAR_IS_PLACEHOLDER = true;
+
 const TASKS = [
+  {
+    id: "gear", name: "Ausrüstungs-Check", custom: "gear",
+    teaser: "Hardware & Arbeitsplatz",
+    why: "Damit du erfolgreich an den Online-Sessions teilnehmen kannst, sammle deine Ausrüstung ein. <strong>Must-haves</strong> brauchst du, <strong>Bonus-Items</strong> machen es angenehmer.",
+  },
+  {
+    id: "rules", name: "Spielregeln", custom: "rules",
+    teaser: "So arbeiten wir zusammen",
+    why: "Damit das Bootcamp für alle produktiv, inspirierend und lebendig wird, braucht es Engagement, Offenheit und gegenseitige Unterstützung. Deck alle Karten auf.",
+  },
+  {
+    id: "calendar", name: "Kalender", custom: "calendar",
+    teaser: "Alle Sessions automatisch",
+    why: "Abonniere den Bootcamp-Kalender: Alle Sessions erscheinen automatisch in deiner Kalender-App und bleiben immer aktuell.",
+  },
   {
     id: "google", name: "Google", icon: "google", color: "var(--blue)",
     teaser: "Classroom, Kalender, Docs & Forms",
@@ -15,6 +34,7 @@ const TASKS = [
   {
     id: "slack", name: "Slack", icon: "slack", color: "var(--yellow)",
     teaser: "Unser Chat für alles",
+    video: { url: "https://www.youtube.com/watch?v=0DA2PUpKRec", label: "Slack als Kommunikationstool", lang: "Deutsch" },
     why: "In Slack läuft die Kommunikation im Bootcamp: Ankündigungen, Fragen, Austausch mit deiner Kohorte.",
     steps: [
       "Gib unten die E-Mail-Adresse an, mit der du Slack nutzen willst. Hast du schon einen Slack-Account, nimm dessen Adresse.",
@@ -25,6 +45,7 @@ const TASKS = [
   {
     id: "miro", name: "Miro", icon: "miro", color: "var(--yellow)",
     teaser: "Whiteboard für Workshops",
+    video: { url: "https://www.youtube.com/watch?v=7L1-0DOGHDY", label: "Einführung in Miro", lang: "Englisch" },
     why: "Auf Miro-Boards arbeiten wir gemeinsam in Workshops: Brainstorming, User Journeys, Priorisierung.",
     steps: [
       "Auf <a href=\"https://miro.com/signup/\" target=\"_blank\" rel=\"noopener\">miro.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.",
@@ -34,6 +55,7 @@ const TASKS = [
   {
     id: "figma", name: "Figma", icon: "figma", color: "var(--red)",
     teaser: "Designs & Prototypen",
+    video: { url: "https://www.youtube.com/watch?v=zzhSFobLkYw&list=PLXDU_eVOJTx5IuSrbtanZHnDuPB3Hx0hq", label: "Figma für Beginner (Playlist)", lang: "Deutsch" },
     why: "In Figma schaust du dir Designs an, kommentierst sie und baust eigene Klick-Prototypen.",
     steps: [
       "Auf <a href=\"https://www.figma.com/signup\" target=\"_blank\" rel=\"noopener\">figma.com</a> einen kostenlosen Account anlegen – oder deinen bestehenden nutzen.",
@@ -75,7 +97,7 @@ const BOSS = SB.BOSS;
 
 
 // Punkte kommen aus schema.js (einzige Quelle)
-TASKS.forEach(t => { t.points = SB.TASKS.find(x => x.id === t.id).points; });
+TASKS.forEach(t => { const d = SB.TASKS.find(x => x.id === t.id); Object.assign(t, { points: d.points, world: d.world, emoji: d.emoji, noEmail: !!d.noEmail }); });
 const MAX = SB.MAX;
 
 /* ---------- Pixel-Sprites (eigene Figuren) ---------- */
@@ -209,6 +231,7 @@ function cursor(label, color = "var(--red)") {
   return `<span class="cursor"><svg viewBox="0 0 24 24"><path d="M3 2l17 8.5-7.2 1.8L9.5 20z" fill="${color}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="background:${color}">${esc(label)}</span></span>`;
 }
 function appIcon(t) {
+  if (t.emoji) return `<span class="app-ico emoji-ico" aria-hidden="true">${t.emoji}</span>`;
   return `<span class="app-ico"><img src="${ICON_CDN}${t.icon}.svg" alt="" data-fallback="${esc(t.name[0])}"></span>`;
 }
 // Logo lädt nicht? Anfangsbuchstaben zeigen. Ohne Inline-Handler, damit eine strenge CSP möglich ist.
@@ -281,7 +304,7 @@ function viewStart() {
       <h1>Wie bereit bist du, ein AI-Powered PM zu werden?</h1>
       <p class="lead">${greet} Bevor es losgeht, richtest du deine Werkzeuge ein. Sammle Punkte, besiege den Endboss – und starte startklar in die erste Session.</p>
       <ul class="rules">
-        <li><span class="ico" style="background:var(--yellow)">${sprite("coin")}</span><span><strong>7 Aufgaben</strong> à 50 Punkte – in beliebiger Reihenfolge</span></li>
+        <li><span class="ico" style="background:var(--yellow)">${sprite("coin")}</span><span><strong>${TASKS.length} Aufgaben</strong> in ${SB.WORLDS.length} Welten, à 50 Punkte – in beliebiger Reihenfolge</span></li>
         <li><span class="ico" style="background:#FFE3E8">${sprite("boss")}</span><span><strong>1 Endboss: GitHub</strong> – 100 Punkte in 4 Treffern</span></li>
         <li><span class="ico" style="background:#E8F5F2">${sprite("flag")}</span><span>Nach jeder Aufgabe geht's <strong>zurück zur Map</strong></span></li>
       </ul>
@@ -355,7 +378,7 @@ function leaderboardStrip() {
 
 function viewMap() {
   const hits = bossHits().length, bossDone = hits === BOSS.hits.length;
-  const stations = TASKS.map(t => {
+  const station = t => {
     const done = taskDone(t.id);
     return `<button class="card station${done ? " done" : ""}" type="button" data-go="#task/${t.id}">
       ${done ? `<span class="flag">${sprite("flag")}</span>` : ""}
@@ -364,16 +387,20 @@ function viewMap() {
       <span class="state">${done ? "✓ Erledigt" : esc(t.teaser)}</span>
       ${state.last === t.id ? cursor(firstName()) : ""}
     </button>`;
+  };
+  const worlds = SB.WORLDS.map(w => {
+    const list = TASKS.filter(t => t.world === w.id), n = list.filter(t => taskDone(t.id)).length;
+    return `<section class="world" aria-label="Welt ${w.id}">
+      <span class="tag world-label">Welt ${w.id} · ${w.name}<span class="world-count">${n}/${list.length}</span></span>
+      <div class="stations">${list.map(station).join("")}</div>
+    </section>`;
   }).join("");
   return `${hud()}<main class="wrap">
     <div class="map-head">
       <div><span class="eyebrow"><span class="emo">🗺️</span>Deine Map</span><h2>Wähle deine nächste Aufgabe</h2></div>
       <div class="ready"><strong>${pct()} %</strong><span>bereit · ${rank()}</span></div>
     </div>
-    <section class="world" aria-label="Aufgaben">
-      <span class="tag world-label">Welt 1 · Werkzeugkiste</span>
-      <div class="stations">${stations}</div>
-    </section>
+    ${worlds}
     <div class="boss-row">
       <button class="card boss-card${bossDone ? " defeated" : ""}" type="button" data-go="#boss">
         ${bossDone ? sprite("bossDown") : animSprite("boss")}
@@ -403,10 +430,79 @@ function emailField(t) {
   </div>`;
 }
 
+/* ---------- Startrampe: Ausrüstung, Spielregeln, Kalender ---------- */
+const taskState = id => state.tasks[id] || {};
+function customReady(id) {
+  const x = taskState(id);
+  if (id === "gear") return (x.items || []).length === SB.GEAR.must.length;
+  if (id === "rules") return (x.seen || []).length === SB.RULES.length && x.pledge === true;
+  if (id === "calendar") return !!x.app && x.confirmed === true;
+  return false;
+}
+function gearBody() {
+  const x = taskState("gear"), items = x.items || [], bonus = x.bonus || [];
+  const card = (g, kind, on) => `<button type="button" class="item ${kind}${on ? " on" : ""}" data-gear="${g.id}" data-kind="${kind}" aria-pressed="${on}">
+      <span class="item-emo" aria-hidden="true">${g.emoji}</span><span class="item-txt"><strong>${g.title}</strong><small>${g.text}</small></span>
+      <span class="item-state">${on ? (kind === "must" ? "✓" : "⭐") : "+"}</span></button>`;
+  return `<div class="card panel">
+    <div class="gear-grid">
+      <div><h2><span class="emo">✓</span>Must-haves <span class="count">${items.length}/${SB.GEAR.must.length}</span></h2>
+        <div class="items">${SB.GEAR.must.map(g => card(g, "must", items.includes(g.id))).join("")}</div></div>
+      <div><h2><span class="emo">⭐</span>Bonus-Items <span class="count">${bonus.length}/${SB.GEAR.bonus.length}</span></h2>
+        <div class="items">${SB.GEAR.bonus.map(g => card(g, "bonus", bonus.includes(g.id))).join("")}</div>
+        <div class="note info"><strong>Grundkenntnisse:</strong> Sicherer Umgang mit Computer, Browser & E-Mail. Interesse an Web-Anwendungen sowie Grundverständnis von Kollaborations- & Chat-Tools (Google Suite, Slack, Zoom) ist hilfreich.</div></div>
+    </div>
+    <p class="hint-line">Klick auf ein Teil, um es einzusammeln. Bonus-Items sind freiwillig und geben keine Punkte, aber Sternchen.</p>
+  </div>`;
+}
+function rulesBody() {
+  const x = taskState("rules"), seen = x.seen || [], all = seen.length === SB.RULES.length;
+  return `<div class="card panel">
+    <h2>Spielregeln <span class="count">${seen.length}/${SB.RULES.length} aufgedeckt</span></h2>
+    <div class="rules-grid">${SB.RULES.map((r, i) => seen.includes(r.id)
+      ? `<div class="rule open"><span class="rule-emo" aria-hidden="true">${r.emoji}</span><strong>${r.title}</strong><small>${r.text}</small></div>`
+      : `<button type="button" class="rule closed" data-rule="${r.id}" aria-label="Regel ${i + 1} aufdecken"><span class="rule-q">?</span><span class="rule-n">${String(i + 1).padStart(2, "0")}</span></button>`).join("")}</div>
+    <label class="check pledge${all ? "" : " locked"}"><input type="checkbox" id="pledge" ${x.pledge ? "checked" : ""} ${all ? "" : "disabled"}> <span>Ich bin dabei<span class="emo emo-after">🤝</span> Ich halte mich an die Spielregeln.${all ? "" : " <em>(erst alle Karten aufdecken)</em>"}</span></label>
+  </div>`;
+}
+const CAL_APPS = {
+  google: { name: "Google Calendar", emoji: "📆", steps: ["<a href=\"https://calendar.google.com\" target=\"_blank\" rel=\"noopener\">calendar.google.com</a> öffnen", "Links bei „Weitere Kalender“ auf <strong>+</strong> → <strong>Per URL</strong>", "URL einfügen → <strong>Kalender hinzufügen</strong>"] },
+  apple: { name: "Apple Kalender", emoji: "🗓️", steps: ["Kalender-App öffnen", "Menü <strong>Ablage → Neues Kalenderabonnement …</strong>", "URL einfügen → <strong>Abonnieren</strong>"] },
+  outlook: { name: "Outlook / Office 365", emoji: "📨", steps: ["<a href=\"https://outlook.com\" target=\"_blank\" rel=\"noopener\">outlook.com</a> → Kalender", "<strong>Kalender hinzufügen → Aus dem Internet abonnieren</strong>", "URL einfügen → <strong>Importieren</strong>"] },
+};
+function calendarBody() {
+  const x = taskState("calendar"), app = CAL_APPS[x.app];
+  return `<div class="card panel">
+    <h2>1. Kalender-Link kopieren</h2>
+    ${codeBox(CALENDAR_URL)}
+    ${CALENDAR_IS_PLACEHOLDER ? `<div class="note warn"><span class="emo">🚧</span>Prototyp: Dieser Link ist ein Platzhalter. Vor Kursstart wird hier der Kalender deiner Kohorte eingetragen.</div>` : ""}
+    <h2 style="margin-top:22px">2. Welche Kalender-App nutzt du?</h2>
+    <div class="cal-apps">${Object.entries(CAL_APPS).map(([k, a]) => `<button type="button" class="cal-app${x.app === k ? " on" : ""}" data-cal="${k}" aria-pressed="${x.app === k}"><span class="emo">${a.emoji}</span>${a.name}</button>`).join("")}</div>
+    ${app ? `<ol class="steps cal-steps">${app.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+      <div class="note info"><span class="emo">💡</span>Der Kalender aktualisiert sich automatisch. Neue Termine oder Änderungen erscheinen ohne weiteres Zutun.</div>
+      <label class="check"><input type="checkbox" id="calok" ${x.confirmed ? "checked" : ""}> Ich habe den Kalender abonniert.</label>` : ""}
+  </div>`;
+}
+function customDone(t) {
+  const done = taskDone(t.id), ready = customReady(t.id);
+  const msg = { gear: "Sammle alle Must-haves ein.", rules: "Deck alle Karten auf und gib dein Versprechen.", calendar: "Wähle deine App und bestätige das Abo." }[t.id];
+  return `<div class="card panel"><div class="task-actions">
+    ${done ? `<span class="done-banner">✓ Erledigt · +${t.points} Punkte</span>` : `<span class="hint-line" style="margin:0">${ready ? "Alles bereit!" : msg}</span>`}
+    <button class="btn btn-primary" id="cdone" type="button" ${ready ? "" : "disabled"}>${done ? "Zur Map" : `Erledigt · +${t.points}`}</button>
+  </div></div>`;
+}
+
 function viewTask(id) {
   const t = TASKS.find(x => x.id === id);
   if (!t) return viewMap();
   const done = taskDone(t.id);
+  if (t.custom) return `${hud()}<main class="wrap"><div class="task">
+    ${navRow(t.id)}
+    <div class="task-head">${appIcon(t)}<div><span class="eyebrow"><span class="emo">📋</span>Welt ${t.world} · +${t.points} Punkte</span><h1>${t.name}</h1></div></div>
+    <p style="font-size:1.08rem;color:var(--muted);margin:0">${t.why}</p>
+    ${t.custom === "gear" ? gearBody() : t.custom === "rules" ? rulesBody() : calendarBody()}
+    ${customDone(t)}
+  </div></main>`;
   const g = (state.tasks.google && state.tasks.google.has) || "";
   const body = t.google ? `
     <div class="card panel">
@@ -429,6 +525,7 @@ function viewTask(id) {
     <div class="card panel">
       <h2>So geht's</h2>
       <ol class="steps">${t.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+      ${t.video ? `<div class="note info"><span class="emo">📺</span>Neu bei ${esc(t.name)}? <a href="${t.video.url}" target="_blank" rel="noopener">${esc(t.video.label)}</a> (${t.video.lang}). Kennst du ${esc(t.name)} schon, kannst du das überspringen.</div>` : ""}
     </div>`;
   return `${hud()}<main class="wrap"><div class="task">
     ${navRow(t.id)}
@@ -608,6 +705,34 @@ function bind() {
       go(state.leaderboard && state.leaderboard.seen ? "#map" : "#leaderboard");
     };
   }
+
+  // Startrampe
+  const keepScroll = () => { const y = scrollY; route(); scrollTo(0, y); };
+  const ensure = id => (state.tasks[id] = state.tasks[id] || { done: false, email: "" });
+  document.querySelectorAll("[data-gear]").forEach(b => b.onclick = () => {
+    const x = ensure("gear"), key = b.dataset.kind === "must" ? "items" : "bonus", list = new Set(x[key] || []);
+    list.has(b.dataset.gear) ? list.delete(b.dataset.gear) : list.add(b.dataset.gear);
+    x[key] = [...list];
+    if (x.done && !customReady("gear")) x.done = false; // Must-have wieder abgegeben → nicht mehr erledigt
+    save(); keepScroll();
+  });
+  document.querySelectorAll("[data-rule]").forEach(b => b.onclick = () => {
+    const x = ensure("rules"); x.seen = [...new Set([...(x.seen || []), b.dataset.rule])]; save(); keepScroll();
+  });
+  const pledge = document.getElementById("pledge");
+  if (pledge) pledge.onchange = () => { const x = ensure("rules"); x.pledge = pledge.checked; if (!pledge.checked) x.done = false; save(); keepScroll(); };
+  document.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { const x = ensure("calendar"); x.app = b.dataset.cal; save(); keepScroll(); });
+  const calok = document.getElementById("calok");
+  if (calok) calok.onchange = () => { const x = ensure("calendar"); x.confirmed = calok.checked; if (!calok.checked) x.done = false; save(); keepScroll(); };
+  const cdone = document.getElementById("cdone");
+  if (cdone) cdone.onclick = () => {
+    const id = location.hash.slice(6), t = TASKS.find(x => x.id === id);
+    if (!customReady(id)) return;
+    const was = taskDone(id);
+    ensure(id).done = true; save();
+    if (!was) toast(`+${t.points}!`);
+    setTimeout(() => go("#map"), was ? 0 : 900);
+  };
 
   // Aufgabe
   const tdone = document.getElementById("tdone");

@@ -1,4 +1,5 @@
 const ICON_CDN = SB.ICON_CDN, ICONS = SB.ICONS;
+const icon = id => SB.TASK_EMOJI[id] ? `<span class="emoji-icon" aria-hidden="true">${SB.TASK_EMOJI[id]}</span>` : `<img src="${ICON_CDN}${ICONS[id]}.svg" alt="">`;
 const DAY = 864e5, NOW = Date.now();
 
 /* ---------- Demo-Kohorte (erfundene Personen) ---------- */
@@ -16,7 +17,13 @@ const DEMO = [
     updatedAt: new Date(NOW - ago * DAY - r() * DAY / 2).toISOString() });
   const GAMER = ["PixelQueen", null, "AmiraAgile", "TurboTim42", "BacklogBoss", null, null, "FelixFlow", "NinjaNina", "RoadmapRanger", null, "SprintPilot"][i];
   if (GAMER) st.leaderboard = { optIn: true, gamerName: GAMER, at: st.consent.at };
-  SB.TASKS.forEach(t => { if (r() < p + .1) st.tasks[t.id] = { done: true, email: t.id === "miro" && r() < .3 ? `${first}@gmail.com` : mail, ...(t.id === "google" ? { has: r() < .5 ? "gmail" : "other" } : {}) }; });
+  SB.TASKS.forEach(t => {
+    if (r() >= p + .1) return;
+    if (t.id === "gear") st.tasks.gear = { done: true, items: SB.GEAR.must.map(g => g.id), bonus: SB.GEAR.bonus.filter(() => r() < .5).map(g => g.id) };
+    else if (t.id === "rules") st.tasks.rules = { done: true, seen: SB.RULES.map(x => x.id), pledge: true };
+    else if (t.id === "calendar") st.tasks.calendar = { done: true, app: SB.CALENDAR_APPS[Math.floor(r() * 3)], confirmed: true };
+    else st.tasks[t.id] = { done: true, email: t.id === "miro" && r() < .3 ? `${first}@gmail.com` : mail, ...(t.id === "google" ? { has: r() < .5 ? "gmail" : "other" } : {}) };
+  });
   const hits = p >= 1 ? 4 : Math.min(4, Math.floor(r() * 5 * p));
   SB.BOSS.hits.slice(0, hits).forEach(h => { st.boss[h.id] = h.id === "account" ? { done: true, user: first + "-" + (100 + i) } : { done: true }; });
   return { ...SB.payload(st), _src: "demo" };
@@ -66,17 +73,17 @@ function render() {
   const weak = new Set(n && minApp < 100 ? appStats.filter(x => x.pct === minApp && !worst.has(x.id)).map(x => x.id) : []);
   const lvl = v => v < 50 ? "low" : v < 80 ? "mid" : "high";
   const S = Object.fromEntries(stats.map(x => [x.id, x]));
-  const thApp = (id, label) => `<th class="${worst.has(id) ? "worst" : weak.has(id) ? "weak" : ""}"><img src="${ICON_CDN}${ICONS[id]}.svg" alt="">${label}<span class="pct ${lvl(S[id].pct)}">${S[id].pct}%</span>${worst.has(id) ? `<span class="worst-tag"><span class="emo">😬</span>am wenigsten</span>` : weak.has(id) ? `<span class="worst-tag weak-tag"><span class="emo">⚠️</span>schwächste App</span>` : ""}</th>`;
+  const thApp = (id, label) => `<th class="${worst.has(id) ? "worst" : weak.has(id) ? "weak" : ""}">${icon(id)}${label}<span class="pct ${lvl(S[id].pct)}">${S[id].pct}%</span>${worst.has(id) ? `<span class="worst-tag"><span class="emo">😬</span>am wenigsten</span>` : weak.has(id) ? `<span class="worst-tag weak-tag"><span class="emo">⚠️</span>schwächste Aufgabe</span>` : ""}</th>`;
   const wc = id => worst.has(id) ? " worst" : weak.has(id) ? " weak" : "";
 
   document.getElementById("rank").innerHTML = `<h2><span class="emo">🧭</span>Wo hakt's?</h2>
     <p class="sub">Erledigt-Quote pro App, die schwächste zuerst. Hier wird die Kohorte am meisten Hilfe brauchen.</p>
     <div class="rank">${stats.slice().sort((a, b) => a.pct - b.pct || a.name.localeCompare(b.name)).map(x => `
       <div class="rank-row${worst.has(x.id) ? " worst" : weak.has(x.id) ? " weak" : ""}">
-        <span class="rank-name"><img src="${ICON_CDN}${ICONS[x.id]}.svg" alt="">${x.name}</span>
+        <span class="rank-name">${icon(x.id)}${x.name}</span>
         <span class="rank-bar"><i class="${lvl(x.pct)}" style="width:${Math.max(x.pct, 2)}%"></i></span>
         <span class="rank-val">${x.pct}%</span><span class="rank-n">${x.count}/${n}</span>
-        <span class="rank-tag">${worst.has(x.id) ? `<span class="emo">😬</span>Seelisch-moralisch vorbereiten` : weak.has(x.id) ? `<span class="emo">⚠️</span>Schwächste App` : ""}</span>
+        <span class="rank-tag">${worst.has(x.id) ? `<span class="emo">😬</span>Seelisch-moralisch vorbereiten` : weak.has(x.id) ? `<span class="emo">⚠️</span>Schwächste Aufgabe` : ""}</span>
       </div>`).join("")}</div>`;
 
   const arr = k => sortKey === k ? `<span class="arr">${sortDir > 0 ? "▲" : "▼"}</span>` : "";
@@ -94,7 +101,7 @@ function render() {
     return `<tr>
       <td class="name"><strong>${esc(p.participant.name)}${p._src !== "demo" ? `<span class="src">${esc(p._src)}</span>` : ""}</strong><small>${esc(p.participant.defaultEmail || "–")}</small>${p.leaderboard && p.leaderboard.optIn ? `<small class="gn"><span class="emo">🏆</span>${esc(p.leaderboard.gamerName)}</small>` : ""}</td>
       <td><div class="prog"><div class="bar"><i style="width:${Number(p.progress.percent) || 0}%"></i></div><b>${Number(p.progress.percent) || 0}%</b></div></td>
-      ${SB.TASKS.map(t => { const x = p.tools[t.id]; return `<td class="${wc(t.id)}">${x.done ? `<span class="ok" title="${esc(x.email || "")}${t.id === "google" && x.accountType ? " · " + esc(x.accountType) : ""}">✓</span>` : `<span class="no">·</span>`}</td>`; }).join("")}
+      ${SB.TASKS.map(t => { const x = p.tools[t.id]; return `<td class="${wc(t.id)}">${x.done ? `<span class="ok" title="${esc(x.email || (t.id === "calendar" ? x.app : t.id === "gear" ? `Bonus: ${(x.bonusItems || []).length}` : "") || "")}${t.id === "google" && x.accountType ? " · " + esc(x.accountType) : ""}">✓</span>` : `<span class="no">·</span>`}</td>`; }).join("")}
       <td class="${wc("github")}" title="${esc(p.github.username ? p.github.profileUrl : "noch kein Profil")}"><span class="pips${p.github.defeated ? " full" : ""}">${hits.map(h => `<i class="${h ? "on" : ""}"></i>`).join("")}</span></td>
       <td class="pts">${Number(p.progress.score) || 0}</td>
       <td class="when${isStale && p.progress.percent < 100 ? " stale" : ""}">${when}</td></tr>`;
@@ -116,9 +123,9 @@ function render() {
 /* CSV mit Schutz gegen Formel-Injection in Tabellenprogrammen */
 function cell(v) { v = String(v ?? ""); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return `"${v.replace(/"/g, '""')}"`; }
 document.getElementById("csv").onclick = () => {
-  const head = ["Name", "Startklar %", "Punkte", ...SB.TASKS.flatMap(t => [`${t.name} erledigt`, `${t.name} E-Mail`]), "GitHub-Benutzername", "GitHub-Profil", "GitHub Treffer", "Zuletzt aktiv"];
+  const head = ["Name", "Startklar %", "Punkte", ...SB.TASKS.flatMap(t => t.noEmail ? [`${t.name} erledigt`] : [`${t.name} erledigt`, `${t.name} E-Mail`]), "GitHub-Benutzername", "GitHub-Profil", "GitHub Treffer", "Zuletzt aktiv"];
   const lines = rows.map(p => [p.participant.name, p.progress.percent, p.progress.score,
-    ...SB.TASKS.flatMap(t => [p.tools[t.id].done ? "ja" : "nein", p.tools[t.id].email || ""]),
+    ...SB.TASKS.flatMap(t => t.noEmail ? [p.tools[t.id].done ? "ja" : "nein"] : [p.tools[t.id].done ? "ja" : "nein", p.tools[t.id].email || ""]),
     p.github.username || "", p.github.profileUrl || "", Object.values(p.github.hits).filter(Boolean).length, p.meta.updatedAt || ""].map(cell).join(";"));
   const blob = new Blob(["﻿" + [head.map(cell).join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "speedyboarding-ergebnisse.csv"; a.click(); URL.revokeObjectURL(a.href);

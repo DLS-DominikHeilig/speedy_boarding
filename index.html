@@ -158,6 +158,45 @@
   .lb-form input { flex: 1; min-width: 180px; }
   .lb-actions { display: flex; gap: 14px; }
   @media (max-width: 520px) { .lb-row { flex-direction: column; } .lb-ico { width: 40px; } }
+  /* Welten & Startrampe */
+  .world + .world { margin-top: 30px; }
+  .world-count { margin-left: 8px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.35); font-family: "JetBrains Mono", monospace; font-size: .78rem; }
+  .emoji-ico { font-size: 1.55rem; line-height: 1; background: var(--bg); }
+  .task-head .emoji-ico { font-size: 2.2rem; }
+  .count { font: 700 12px "JetBrains Mono", monospace; color: var(--petrol); background: #E8F5F2; padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: 3px; letter-spacing: 0; }
+  .hint-line { color: var(--soft); font-size: .9rem; margin: 14px 0 0; }
+  .gear-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .items { display: grid; gap: 10px; }
+  .item { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: #fff; cursor: pointer; font: inherit; color: var(--text); transition: border-color .15s, background .15s, transform .1s; }
+  .item:hover { transform: translateY(-1px); border-color: #cfcfcf; }
+  .item.must { background: #F7FCFB; }
+  .item-emo { font-size: 1.4rem; width: 30px; text-align: center; flex: none; }
+  .item-txt { flex: 1; display: grid; }
+  .item-txt small { color: var(--muted); font-size: .85rem; }
+  .item-state { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-weight: 800; background: var(--bg); color: var(--soft); flex: none; }
+  .item.on.must { border-color: var(--petrol); background: #E8F5F2; }
+  .item.on.must .item-state { background: var(--petrol); color: #fff; }
+  .item.on.bonus { border-color: var(--yellow); background: #FEF8E6; }
+  .item.on.bonus .item-state { background: var(--yellow); }
+  .rules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .rule { min-height: 150px; border-radius: 12px; padding: 14px; display: grid; align-content: start; gap: 6px; text-align: left; }
+  .rule.open { border: 2px solid var(--line); background: #fff; animation: flip .35s ease-out; }
+  .rule.open small { color: var(--muted); font-size: .85rem; line-height: 1.45; }
+  .rule-emo { font-size: 1.5rem; }
+  .rule.closed { border: 0; cursor: pointer; color: #fff; place-items: center; align-content: center; font: inherit; position: relative;
+    background-color: var(--petrol); background-image: radial-gradient(rgba(255,255,255,.18) 1.5px, transparent 1.5px); background-size: 12px 12px; transition: transform .12s; }
+  .rule.closed:hover { transform: translateY(-3px) rotate(-1deg); }
+  .rule-q { font: 800 2.6rem Manrope, sans-serif; }
+  .rule-n { position: absolute; bottom: 8px; right: 10px; font: 700 11px "JetBrains Mono", monospace; opacity: .7; }
+  @keyframes flip { from { transform: rotateY(90deg); opacity: .3; } to { transform: none; opacity: 1; } }
+  .pledge { margin-top: 20px; padding: 14px 16px; border-radius: 12px; background: #F3FAF8; }
+  .pledge.locked { opacity: .55; background: var(--bg); }
+  .pledge em { font-weight: 500; color: var(--soft); }
+  .cal-apps { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cal-app { font: inherit; font-weight: 700; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--line); background: #fff; cursor: pointer; color: var(--text); }
+  .cal-app.on { border-color: var(--petrol); background: #E8F5F2; }
+  .cal-steps { margin-top: 16px; }
+  @media (max-width: 860px) { .gear-grid { grid-template-columns: 1fr; } .rules-grid { grid-template-columns: repeat(2, 1fr); } }
   .linkbtn { background: none; border: 0; padding: 0; font: inherit; color: var(--soft); font-weight: 600; text-decoration: underline; cursor: pointer; }
   .map-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 60px; flex-wrap: wrap; color: var(--soft); font-size: .9rem; }
 

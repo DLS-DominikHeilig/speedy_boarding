@@ -8,14 +8,55 @@ window.SB = (() => {
   const SCHEMA_VERSION = 1;
   const STORAGE_KEY = "speedyboarding-v2";
 
+  /* world 1 = Startrampe (Vorbereitung), world 2 = Werkzeugkiste (Apps) */
+  const WORLDS = [
+    { id: 1, name: "Startrampe" },
+    { id: 2, name: "Werkzeugkiste" },
+  ];
+
+  /* Ausrüstungs-Check: Must-haves zählen, Nice-to-haves sind Bonus-Items ohne Punkte */
+  const GEAR = {
+    must: [
+      { id: "computer", emoji: "🖥️", title: "Notebook oder Computer", text: "Mac oder Windows" },
+      { id: "webcam", emoji: "📹", title: "Hochwertige Webcam", text: "Mindestens 1080p Auflösung (extern empfohlen)" },
+      { id: "headset", emoji: "🎙️", title: "Mikrofon oder Headset", text: "Kabelgebunden für stabile Audioqualität" },
+      { id: "internet", emoji: "🌐", title: "Stabile Internetverbindung", text: "Gutes Down- & Upload – bei instabilem WLAN: LAN empfohlen" },
+      { id: "accounts", emoji: "📧", title: "E-Mail- und Google-Konto", text: "Für Einladungen & Google Classroom" },
+      { id: "quiet", emoji: "🤫", title: "Ruhiger Arbeitsort", text: "Ein Raum, in dem du ungestört arbeiten kannst" },
+    ],
+    bonus: [
+      { id: "monitor", emoji: "🖼️", title: "Externer Monitor", text: "Mehr Platz für Figma, Miro & Zoom parallel" },
+      { id: "light", emoji: "💡", title: "Separate Lichtquelle", text: "Optional mit Helligkeitsregelung" },
+      { id: "background", emoji: "🎬", title: "Neutraler Hintergrund", text: "Oder ein passender virtueller Hintergrund" },
+      { id: "ergo", emoji: "🪑", title: "Ergonomischer Arbeitsplatz", text: "Optimal mit Stehtisch" },
+    ],
+  };
+
+  /* Spielregeln: alle Karten aufdecken + Versprechen */
+  const RULES = [
+    { id: "meetings", emoji: "📹", title: "Sessions wie Geschäftstermine", text: "Kamera an, aktiv mitmachen, ruhiges Umfeld – keine parallelen Termine." },
+    { id: "language", emoji: "🗣️", title: "Sprache im Bootcamp", text: "Überwiegend Deutsch – einige Sessions und Materialien sind auf Englisch." },
+    { id: "team", emoji: "🤝", title: "Teamarbeit zählt", text: "Teile Ideen, gib Feedback, unterstütze andere – jede Perspektive zählt." },
+    { id: "respect", emoji: "💛", title: "Respektvoll & offen", text: "Unterschiedliche Meinungen bereichern. Sachlich, interessiert, wertschätzend bleiben." },
+    { id: "visual", emoji: "🎨", title: "Visualisiere deine Ideen", text: "Miro, Figma oder Stift & Papier – sichtbare Gedanken beleben Diskussionen." },
+    { id: "feedback", emoji: "🪞", title: "Konstruktive Feedbackkultur", text: "Beschreibend statt bewertend, lösungsorientiert geben – und offen annehmen." },
+    { id: "prepared", emoji: "🧭", title: "Vorbereitet & organisiert", text: "Technik prüfen, pünktlich starten, Zeit zum Vertiefen und Ausprobieren einplanen." },
+    { id: "curious", emoji: "🚀", title: "Neugierig bleiben", text: "Experimentieren, reflektieren, verbessern – Fehler gehören dazu." },
+  ];
+
+  const CALENDAR_APPS = ["google", "apple", "outlook"];
+
   const TASKS = [
-    { id: "google",  name: "Google",  points: 50 },
-    { id: "slack",   name: "Slack",   points: 50 },
-    { id: "miro",    name: "Miro",    points: 50 },
-    { id: "figma",   name: "Figma",   points: 50 },
-    { id: "jira",    name: "Jira",    points: 50 },
-    { id: "claude",  name: "Claude",  points: 50 },
-    { id: "chatgpt", name: "ChatGPT", points: 50 },
+    { id: "gear",     name: "Ausrüstungs-Check", points: 50, world: 1, emoji: "🎒", noEmail: true },
+    { id: "rules",    name: "Spielregeln",       points: 50, world: 1, emoji: "📜", noEmail: true },
+    { id: "calendar", name: "Kalender",          points: 50, world: 1, emoji: "📅", noEmail: true },
+    { id: "google",  name: "Google",  points: 50, world: 2 },
+    { id: "slack",   name: "Slack",   points: 50, world: 2 },
+    { id: "miro",    name: "Miro",    points: 50, world: 2 },
+    { id: "figma",   name: "Figma",   points: 50, world: 2 },
+    { id: "jira",    name: "Jira",    points: 50, world: 2 },
+    { id: "claude",  name: "Claude",  points: 50, world: 2 },
+    { id: "chatgpt", name: "ChatGPT", points: 50, world: 2 },
   ];
 
   const BOSS = {
@@ -59,7 +100,14 @@ window.SB = (() => {
     st.updatedAt = typeof raw.updatedAt === "string" ? raw.updatedAt : null;
     if (isObj(raw.tasks)) TASKS.forEach(t => {
       const x = raw.tasks[t.id];
-      if (isObj(x)) st.tasks[t.id] = { done: x.done === true, email: str(x.email), ...(typeof x.has === "string" ? { has: x.has } : {}) };
+      if (!isObj(x)) return;
+      const o = { done: x.done === true, email: str(x.email) };
+      if (typeof x.has === "string") o.has = x.has;
+      const pick = (arr, list) => Array.isArray(arr) ? [...new Set(arr.filter(v => list.some(i => i.id === v)))] : [];
+      if (t.id === "gear") { o.items = pick(x.items, GEAR.must); o.bonus = pick(x.bonus, GEAR.bonus); }
+      if (t.id === "rules") { o.seen = pick(x.seen, RULES); o.pledge = x.pledge === true; }
+      if (t.id === "calendar") { if (CALENDAR_APPS.includes(x.app)) o.app = x.app; o.confirmed = x.confirmed === true; }
+      st.tasks[t.id] = o;
     });
     if (isObj(raw.boss)) BOSS.hits.forEach(h => {
       const x = raw.boss[h.id];
@@ -99,8 +147,10 @@ window.SB = (() => {
     const tools = {};
     TASKS.forEach(t => {
       const raw = st.tasks[t.id] || {};
-      tools[t.id] = { done: !!raw.done, email: raw.email || null };
+      tools[t.id] = t.noEmail ? { done: !!raw.done } : { done: !!raw.done, email: raw.email || null };
       if (t.id === "google") tools.google.accountType = raw.has || null; // "gmail" | "other" | "none"
+      if (t.id === "gear") { tools.gear.mustHaves = (raw.items || []).length; tools.gear.bonusItems = raw.bonus || []; }
+      if (t.id === "calendar") tools.calendar.app = raw.app || null; // "google" | "apple" | "outlook"
     });
     const user = (st.boss.account && st.boss.account.user) || null;
     const hits = {};
@@ -141,7 +191,8 @@ window.SB = (() => {
   /* Gemeinsame Helfer für alle Seiten */
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/";
+  const TASK_EMOJI = Object.fromEntries(TASKS.filter(t => t.emoji).map(t => [t.id, t.emoji]));
   const ICONS = { google: "google", slack: "slack", miro: "miro", figma: "figma", jira: "jira", claude: "claude", chatgpt: "openai", github: "github" };
 
-  return { esc, ICON_CDN, ICONS, containsRealName, sanitize, clear, validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
+  return { WORLDS, GEAR, RULES, CALENDAR_APPS, TASK_EMOJI, esc, ICON_CDN, ICONS, containsRealName, sanitize, clear, validGamerName, SCHEMA_VERSION, STORAGE_KEY, TASKS, BOSS, RANKS, MAX, blank, load, save, taskDone, hitDone, score, percent, rank, payload };
 })();
