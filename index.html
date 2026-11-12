@@ -38,6 +38,12 @@
   .btn:active { transform: translateY(1px); }
   .btn-primary { background: var(--teal); color: var(--dark); box-shadow: 0 4px 0 #00b9a6; }
   .btn-primary:hover { box-shadow: 0 6px 0 #00b9a6; transform: translateY(-1px); }
+  /* Pixel-Shine beim Hover */
+  .btn-primary { position: relative; overflow: hidden; }
+  .btn-primary::after { content: ""; position: absolute; top: 0; left: -64px; width: 4px; height: 4px; background: transparent; pointer-events: none; opacity: 0;
+    box-shadow: 24px 0px rgba(255,255,255,0.8), 28px 0px rgba(255,255,255,0.8), 36px 0px rgba(255,255,255,0.5), 24px 4px rgba(255,255,255,0.8), 28px 4px rgba(255,255,255,0.8), 36px 4px rgba(255,255,255,0.5), 20px 8px rgba(255,255,255,0.8), 24px 8px rgba(255,255,255,0.8), 32px 8px rgba(255,255,255,0.5), 20px 12px rgba(255,255,255,0.8), 24px 12px rgba(255,255,255,0.8), 32px 12px rgba(255,255,255,0.5), 16px 16px rgba(255,255,255,0.8), 20px 16px rgba(255,255,255,0.8), 28px 16px rgba(255,255,255,0.5), 16px 20px rgba(255,255,255,0.8), 20px 20px rgba(255,255,255,0.8), 28px 20px rgba(255,255,255,0.5), 12px 24px rgba(255,255,255,0.8), 16px 24px rgba(255,255,255,0.8), 24px 24px rgba(255,255,255,0.5), 12px 28px rgba(255,255,255,0.8), 16px 28px rgba(255,255,255,0.8), 24px 28px rgba(255,255,255,0.5), 8px 32px rgba(255,255,255,0.8), 12px 32px rgba(255,255,255,0.8), 20px 32px rgba(255,255,255,0.5), 8px 36px rgba(255,255,255,0.8), 12px 36px rgba(255,255,255,0.8), 20px 36px rgba(255,255,255,0.5), 4px 40px rgba(255,255,255,0.8), 8px 40px rgba(255,255,255,0.8), 16px 40px rgba(255,255,255,0.5), 4px 44px rgba(255,255,255,0.8), 8px 44px rgba(255,255,255,0.8), 16px 44px rgba(255,255,255,0.5), 0px 48px rgba(255,255,255,0.8), 4px 48px rgba(255,255,255,0.8), 12px 48px rgba(255,255,255,0.5), 0px 52px rgba(255,255,255,0.8), 4px 52px rgba(255,255,255,0.8), 12px 52px rgba(255,255,255,0.5); }
+  .btn-primary:hover:not(:disabled)::after, .btn-primary:focus-visible::after { animation: pixel-shine .6s steps(12) forwards; }
+  @keyframes pixel-shine { 0% { left: -64px; opacity: 1; } 99% { opacity: 1; } 100% { left: calc(100% + 8px); opacity: 0; } }
   .btn-primary:disabled { background: var(--line); color: var(--soft); box-shadow: none; cursor: not-allowed; transform: none; }
   .btn-dark { background: var(--dark); color: #fff; }
   .btn-ghost { background: transparent; color: var(--muted); padding: 8px 0; font-weight: 600; }
